@@ -42,6 +42,15 @@ export function deleteBook(id: string) {
   return request<{ ok: boolean }>(`/api/books/${id}`, { method: 'DELETE' })
 }
 
+export function updateBookContent(id: string, content: string) {
+  if (isStaticReadonly) return Promise.reject(new Error('线上为只读模式，不支持编辑'))
+  return request<BookDetail>(`/api/books/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content }),
+  })
+}
+
 export function fetchAnnotations(bookId: string) {
   if (isStaticReadonly) return staticFetchAnnotations(bookId)
   return request<Annotation[]>(`/api/books/${bookId}/annotations`)

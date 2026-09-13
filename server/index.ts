@@ -129,6 +129,39 @@ app.get('/api/books/:id', async (req, res) => {
   res.json({ ...toBookMeta(item), content })
 })
 
+app.put('/api/books/:id', async (req, res) => {
+  const list = await readManifest()
+  const index = list.findIndex((book) => book.id === req.params.id)
+  if (index === -1) {
+    res.status(404).json({ message: '书籍不存在' })
+    return
+  }
+
+  const content = typeof req.body?.content === 'string' ? req.body.content : ''
+  if (!content.trim()) {
+    res.status(400).json({ message: '内容不能为空' })
+    return
+  }
+
+  const item = list[index]
+  const { body, data } = parseFrontmatter(content)
+  const title = data.title || extractTitle(body, item.title)
+  const author = data.author || item.author
+  const nextItem: ManifestItem = {
+    ...item,
+    title,
+    author,
+  }
+
+  await fs.writeFile(path.join(booksDir, item.file), content, 'utf-8')
+  if (nextItem.title !== item.title || nextItem.author !== item.author) {
+    list[index] = nextItem
+    await writeManifest(list)
+  }
+
+  res.json({ ...toBookMeta(nextItem), content })
+})
+
 app.post('/api/books/import', upload.array('files'), async (req, res) => {
   const files = req.files as Express.Multer.File[] | undefined
   if (!files?.length) {

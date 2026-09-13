@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -11,8 +11,10 @@ import {
   fetchProgress,
   saveProgress,
   updateAnnotation,
+  updateBookContent,
 } from '../api/books'
 import { useTheme } from '../hooks/useTheme'
+import { useAutoSave } from '../hooks/useAutoSave'
 import { isStaticReadonly } from '../config'
 import type { Annotation, AnnotationType, BookDetail, TocItem } from '../types'
 import { HIGHLIGHT_COLORS } from '../types'
@@ -22,7 +24,13 @@ import {
   getOffsetInScroller,
   stripFrontmatter,
 } from '../utils/markdown'
-import { getRangeFromOffsets, getTextOffsetInRoot } from '../utils/selection'
+import {
+  markdownToHtml,
+  mergeFrontmatter,
+  serializeEditableHtml,
+} from '../utils/markdown-html'
+import { tryApplyMarkdownShortcutOnSpace, tryBreakHeadingOnEnter } from '../utils/markdown-shortcuts'
+import { getRangeFromOffsets, getTextOffsetInRoot, wrapRangeWithMark } from '../utils/selection'
 import PanelToc from '../components/PanelToc'
 import PanelThoughts from '../components/PanelThoughts'
 import ToolbarAnnotation from '../components/ToolbarAnnotation'
@@ -36,6 +44,25 @@ type SelectionState = {
   rect: DOMRect
 }
 
+function buildTocFromHeadings(headings: HTMLElement[]) {
+  const used = new Map<string, number>()
+  return headings.map((heading, index) => {
+    const level = Number(heading.tagName.replace('H', '')) || 1
+    const text = (heading.textContent || '').replace(/\s+/g, ' ').trim() || `标题 ${index + 1}`
+    let id =
+      text
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\u4e00-\u9fa5-]/g, '') || `heading-${index}`
+    const count = used.get(id) || 0
+    used.set(id, count + 1)
+    if (count > 0) id = `${id}-${count}`
+    heading.id = id
+    heading.dataset.tocIndex = String(index)
+    return { id, text, level } satisfies TocItem
+  })
+}
+
 function PageReader() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
@@ -43,7 +70,15 @@ function PageReader() {
   const contentRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const restoredRef = useRef(false)
+  const targetScrollRatioRef = useRef(0)
+  const restoreDoneRef = useRef(false)
+  const applyingRestoreRef = useRef(false)
+  const lastAppliedTopRef = useRef(0)
+  const latestRatioRef = useRef(0)
   const saveTimer = useRef<number | null>(null)
+  const contentEpochRef = useRef('')
+  const skipBootstrapRef = useRef(false)
+  const bookRef = useRef<BookDetail | null>(null)
 
   const [book, setBook] = useState<BookDetail | null>(null)
   const [annotations, setAnnotations] = useState<Annotation[]>([])
@@ -60,8 +95,16 @@ function PageReader() {
   const [showThoughts, setShowThoughts] = useState(false)
   const [showDeleteBookModal, setShowDeleteBookModal] = useState(false)
   const [deletingBook, setDeletingBook] = useState(false)
+  const [readProgress, setReadProgress] = useState(0)
+  const [liveMarkdown, setLiveMarkdown] = useState('')
+  const [contentRevision, setContentRevision] = useState(0)
 
-  const markdown = useMemo(() => (book ? stripFrontmatter(book.content) : ''), [book])
+  bookRef.current = book
+
+  const markdown = useMemo(
+    () => (isStaticReadonly && book ? stripFrontmatter(book.content) : liveMarkdown),
+    [book, liveMarkdown],
+  )
   const charCount = useMemo(() => countContentChars(markdown), [markdown])
   const readingTime = useMemo(() => formatReadingTime(charCount), [charCount])
   const thoughts = useMemo(
@@ -70,9 +113,53 @@ function PageReader() {
   )
   const showToolbar = !isStaticReadonly && Boolean(toolbarRect && (selection || editingId))
   const toolbarMode = editingId ? 'edit' : 'create'
+  const canEdit = !isStaticReadonly
+
+  const persistContent = useCallback(
+    async (fullContent: string) => {
+      const updated = await updateBookContent(id, fullContent)
+      setBook((prev) => {
+        if (!prev) return updated
+        // 保存期间若正文又变了，保留本地新内容，避免旧请求把 ## 段落写回界面
+        if (prev.content !== fullContent) {
+          return {
+            ...updated,
+            content: prev.content,
+          }
+        }
+        skipBootstrapRef.current = true
+        return updated
+      })
+    },
+    [id],
+  )
+
+  const {
+    status: saveStatus,
+    error: saveError,
+    markSynced,
+    flush: flushContentSave,
+  } = useAutoSave(book?.content || '', {
+    delay: 700,
+    enabled: canEdit && Boolean(book),
+    onSave: persistContent,
+  })
 
   function getHeadingElements() {
     return Array.from(contentRef.current?.querySelectorAll('h1,h2,h3,h4,h5,h6') || []) as HTMLElement[]
+  }
+
+  function syncTocFromDom() {
+    const nextToc = buildTocFromHeadings(getHeadingElements())
+    setToc((prev) => {
+      if (
+        prev.length === nextToc.length &&
+        prev.every((item, index) => item.id === nextToc[index].id && item.text === nextToc[index].text)
+      ) {
+        return prev
+      }
+      return nextToc
+    })
   }
 
   function clearToolbar() {
@@ -95,12 +182,32 @@ function PageReader() {
     setToolbarRect(rect)
   }
 
+  function scheduleContentSaveFromDom() {
+    const root = contentRef.current
+    const current = bookRef.current
+    if (!root || !current || !canEdit) return
+
+    const body = serializeEditableHtml(root)
+    const full = mergeFrontmatter(current.content, body)
+    setLiveMarkdown(stripFrontmatter(full))
+    syncTocFromDom()
+    // 触发自动保存：只更新 content 字段，避免整页重挂载
+    setBook((prev) => (prev ? { ...prev, content: full } : prev))
+  }
+
   useEffect(() => {
     let cancelled = false
 
     async function load() {
       setError('')
       restoredRef.current = false
+      restoreDoneRef.current = false
+      lastAppliedTopRef.current = 0
+      targetScrollRatioRef.current = 0
+      contentEpochRef.current = ''
+      skipBootstrapRef.current = false
+      setReadProgress(0)
+      setLiveMarkdown('')
       clearToolbar()
       try {
         const [bookData, annotationData, progressData] = await Promise.all([
@@ -109,17 +216,16 @@ function PageReader() {
           fetchProgress(id),
         ])
         if (cancelled) return
+        const ratio = progressData.scrollRatio ?? 0
+        targetScrollRatioRef.current = ratio
+        latestRatioRef.current = ratio
+        setReadProgress(ratio)
+        setLiveMarkdown(stripFrontmatter(bookData.content))
+        markSynced(bookData.content)
         setBook(bookData)
         setAnnotations(annotationData)
         setToc([])
-
-        requestAnimationFrame(() => {
-          const el = scrollRef.current
-          if (!el) return
-          const max = el.scrollHeight - el.clientHeight
-          el.scrollTop = Math.max(0, max * (progressData.scrollRatio || 0))
-          restoredRef.current = true
-        })
+        setContentRevision((value) => value + 1)
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : '加载失败')
       }
@@ -129,41 +235,37 @@ function PageReader() {
     return () => {
       cancelled = true
     }
-  }, [id])
+  }, [id, markSynced])
 
+  // 本地可编辑：用 HTML 引导正文，之后由 contentEditable 接管
   useLayoutEffect(() => {
-    const headings = getHeadingElements()
+    if (!canEdit || !book) return
+    const root = contentRef.current
+    if (!root) return
+
+    const epoch = `${book.id}::${contentRevision}`
+    if (skipBootstrapRef.current) {
+      skipBootstrapRef.current = false
+      contentEpochRef.current = epoch
+      return
+    }
+    if (contentEpochRef.current === epoch) return
+
+    root.innerHTML = markdownToHtml(stripFrontmatter(book.content))
+    contentEpochRef.current = epoch
+    setLiveMarkdown(stripFrontmatter(book.content))
+    syncTocFromDom()
+  }, [book, canEdit, contentRevision])
+
+  // 静态只读：仍从 ReactMarkdown 生成目录
+  useLayoutEffect(() => {
+    if (canEdit) return
     if (!markdown) {
       setToc([])
       return
     }
-
-    const used = new Map<string, number>()
-    const nextToc = headings.map((heading, index) => {
-      const level = Number(heading.tagName.replace('H', '')) || 1
-      const text = (heading.textContent || '').replace(/\s+/g, ' ').trim() || `标题 ${index + 1}`
-      let id = text
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w\u4e00-\u9fa5-]/g, '') || `heading-${index}`
-      const count = used.get(id) || 0
-      used.set(id, count + 1)
-      if (count > 0) id = `${id}-${count}`
-      heading.id = id
-      heading.dataset.tocIndex = String(index)
-      return { id, text, level }
-    })
-
-    setToc((prev) => {
-      if (
-        prev.length === nextToc.length &&
-        prev.every((item, index) => item.id === nextToc[index].id && item.text === nextToc[index].text)
-      ) {
-        return prev
-      }
-      return nextToc
-    })
-  }, [markdown])
+    syncTocFromDom()
+  }, [canEdit, markdown])
 
   useLayoutEffect(() => {
     const root = contentRef.current
@@ -177,7 +279,6 @@ function PageReader() {
       parent.normalize()
     })
 
-    // 标注改写 DOM 后，重新同步标题 id，避免跳转失效
     getHeadingElements().forEach((heading, index) => {
       const tocId = toc[index]?.id
       if (tocId) {
@@ -190,26 +291,109 @@ function PageReader() {
 
     const sorted = [...annotations].sort((a, b) => b.startOffset - a.startOffset)
     for (const item of sorted) {
+      if (item.endOffset <= item.startOffset) continue
       const range = getRangeFromOffsets(root, item.startOffset, item.endOffset)
-      if (!range) continue
-      try {
+      if (!range || range.collapsed) continue
+      wrapRangeWithMark(range, () => {
         const mark = document.createElement('mark')
         mark.className = `mark-layer mark-${item.type}`
         mark.style.backgroundColor = `${item.color}88`
         mark.dataset.annotationId = item.id
+        mark.contentEditable = 'false'
         if (item.type === 'doubt') mark.classList.add('is-doubt')
         if (item.type === 'thought') mark.classList.add('is-thought')
         if (editingId === item.id) mark.classList.add('is-editing')
-        range.surroundContents(mark)
-      } catch {
-        // overlapping ranges may fail; skip safely
-      }
+        return mark
+      })
     }
-  }, [annotations, markdown, editingId, toc])
+  }, [annotations, editingId, toc, contentRevision])
+
+  useLayoutEffect(() => {
+    if (!book || restoreDoneRef.current) return
+
+    const el = scrollRef.current
+    if (!el) return
+
+    const ratio = targetScrollRatioRef.current
+    let alive = true
+    let lastHeight = -1
+    let stableFrames = 0
+
+    function applyRestore() {
+      if (!alive || !scrollRef.current || restoreDoneRef.current) return
+      const target = scrollRef.current
+      const max = target.scrollHeight - target.clientHeight
+
+      // 高度未就绪时继续等，不写入错误进度
+      if (ratio > 0 && max <= 0) return
+
+      const nextTop = Math.max(0, max * ratio)
+      applyingRestoreRef.current = true
+      if (Math.abs(target.scrollTop - nextTop) > 1) target.scrollTop = nextTop
+      lastAppliedTopRef.current = nextTop
+      applyingRestoreRef.current = false
+      latestRatioRef.current = ratio
+      restoredRef.current = true
+      setReadProgress(ratio)
+
+      const height = target.scrollHeight
+      if (height === lastHeight) stableFrames += 1
+      else {
+        stableFrames = 0
+        lastHeight = height
+      }
+
+      // 连续几帧高度不变，认为布局稳定，结束校正
+      if (ratio === 0 || stableFrames >= 3) restoreDoneRef.current = true
+    }
+
+    function onUserScrollIntent() {
+      if (!restoredRef.current || applyingRestoreRef.current) return
+      restoreDoneRef.current = true
+    }
+
+    applyRestore()
+    requestAnimationFrame(applyRestore)
+
+    const observer = new ResizeObserver(() => {
+      applyRestore()
+    })
+    observer.observe(el)
+    if (contentRef.current) observer.observe(contentRef.current)
+
+    el.addEventListener('wheel', onUserScrollIntent, { passive: true })
+    el.addEventListener('touchstart', onUserScrollIntent, { passive: true })
+    el.addEventListener('pointerdown', onUserScrollIntent)
+
+    const doneTimer = window.setTimeout(() => {
+      applyRestore()
+      restoreDoneRef.current = true
+      observer.disconnect()
+    }, 2000)
+
+    return () => {
+      alive = false
+      window.clearTimeout(doneTimer)
+      observer.disconnect()
+      el.removeEventListener('wheel', onUserScrollIntent)
+      el.removeEventListener('touchstart', onUserScrollIntent)
+      el.removeEventListener('pointerdown', onUserScrollIntent)
+    }
+  }, [book, annotations, toc, contentRevision])
 
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
+
+    function flushProgress() {
+      // 恢复未完成前不落盘，避免把中间错误比例写进去
+      if (!restoreDoneRef.current) return
+      if (saveTimer.current) {
+        window.clearTimeout(saveTimer.current)
+        saveTimer.current = null
+      }
+      void saveProgress(id, latestRatioRef.current)
+    }
 
     function onScroll() {
       const target = scrollRef.current
@@ -217,12 +401,17 @@ function PageReader() {
       const max = target.scrollHeight - target.clientHeight
       const ratio = max > 0 ? target.scrollTop / max : 0
 
-      if (restoredRef.current) {
-        if (saveTimer.current) window.clearTimeout(saveTimer.current)
-        saveTimer.current = window.setTimeout(() => {
-          void saveProgress(id, ratio)
-        }, 400)
+      if (!applyingRestoreRef.current) {
+        latestRatioRef.current = ratio
+        setReadProgress(ratio)
       }
+
+      if (!restoreDoneRef.current) return
+
+      if (saveTimer.current) window.clearTimeout(saveTimer.current)
+      saveTimer.current = window.setTimeout(() => {
+        void saveProgress(id, latestRatioRef.current)
+      }, 400)
 
       const headings = getHeadingElements()
       let current = ''
@@ -234,12 +423,29 @@ function PageReader() {
       if (current) setActiveHeading(current)
     }
 
+    function onPageHide() {
+      flushProgress()
+      if (canEdit) void flushContentSave()
+    }
+
+    function onVisibilityChange() {
+      if (document.visibilityState === 'hidden') {
+        flushProgress()
+        if (canEdit) void flushContentSave()
+      }
+    }
+
     el.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('pagehide', onPageHide)
+    document.addEventListener('visibilitychange', onVisibilityChange)
     return () => {
       el.removeEventListener('scroll', onScroll)
-      if (saveTimer.current) window.clearTimeout(saveTimer.current)
+      window.removeEventListener('pagehide', onPageHide)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      flushProgress()
+      if (canEdit) void flushContentSave()
     }
-  }, [id, markdown])
+  }, [id, markdown, canEdit, flushContentSave])
 
   useEffect(() => {
     if (!showToolbar) return
@@ -251,6 +457,26 @@ function PageReader() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [showToolbar])
+
+  function handleContentInput(_event: FormEvent<HTMLElement>) {
+    if (!canEdit) return
+    scheduleContentSaveFromDom()
+  }
+
+  function handleContentKeyDown(event: ReactKeyboardEvent<HTMLElement>) {
+    if (!canEdit) return
+    const root = contentRef.current
+    if (!root) return
+
+    if (tryBreakHeadingOnEnter(root, event.nativeEvent)) {
+      scheduleContentSaveFromDom()
+      return
+    }
+
+    if (tryApplyMarkdownShortcutOnSpace(root, event.nativeEvent)) {
+      scheduleContentSaveFromDom()
+    }
+  }
 
   function handleMouseUp(event: MouseEvent<HTMLElement>) {
     if (isStaticReadonly) return
@@ -279,14 +505,24 @@ function PageReader() {
       return
     }
 
-    const text = sel.toString().trim()
+    const text = sel.toString().replace(/\s+/g, ' ').trim()
     if (!text) {
       clearToolbar()
       return
     }
 
-    const startOffset = getTextOffsetInRoot(root, range.startContainer, range.startOffset)
-    const endOffset = getTextOffsetInRoot(root, range.endContainer, range.endOffset)
+    let startOffset = getTextOffsetInRoot(root, range.startContainer, range.startOffset)
+    let endOffset = getTextOffsetInRoot(root, range.endContainer, range.endOffset)
+    if (startOffset > endOffset) {
+      const swap = startOffset
+      startOffset = endOffset
+      endOffset = swap
+    }
+    if (endOffset <= startOffset) {
+      clearToolbar()
+      return
+    }
+
     const rect = range.getBoundingClientRect()
     setEditingId(null)
     setSelection({ text, startOffset, endOffset, rect })
@@ -355,7 +591,6 @@ function PageReader() {
       null
     if (!el) return
 
-    // 将对应标题对齐到阅读区顶部
     const top = Math.max(0, getOffsetInScroller(scroller, el))
     scroller.scrollTo({ top, behavior: 'auto' })
     setActiveHeading(el.id || headingId)
@@ -369,6 +604,15 @@ function PageReader() {
     scroller.scrollTo({ top, behavior: 'smooth' })
     openEditAnnotation(item, (mark as HTMLElement).getBoundingClientRect())
   }
+
+  const saveLabel =
+    saveStatus === 'saving'
+      ? '保存中…'
+      : saveStatus === 'error'
+        ? saveError || '保存失败'
+        : saveStatus === 'saved'
+          ? '已保存'
+          : ''
 
   if (error) {
     return (
@@ -389,6 +633,17 @@ function PageReader() {
 
   return (
     <main className="page-reader">
+      <div
+        className="reader-progress"
+        role="progressbar"
+        aria-label="阅读进度"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(readProgress * 100)}
+      >
+        <div className="reader-progress-bar" style={{ width: `${readProgress * 100}%` }} />
+      </div>
+
       <div className="reader-top">
         <div className="reader-top-left">
           <Link to="/" className="back-link">
@@ -397,7 +652,14 @@ function PageReader() {
           <div className="reader-title-block">
             <h1>{book.title}</h1>
             <p className="reader-stats">
-              共 {charCount.toLocaleString()} 字 · 预计 {readingTime}读完
+              共 {charCount.toLocaleString()} 字 · 预计 {readingTime}读完 · 已读{' '}
+              {Math.round(readProgress * 100)}%
+              {canEdit && saveLabel ? (
+                <span className={saveStatus === 'error' ? 'reader-save-error' : 'reader-save-status'}>
+                  {' '}
+                  · {saveLabel}
+                </span>
+              ) : null}
             </p>
           </div>
         </div>
@@ -432,9 +694,22 @@ function PageReader() {
         />
 
         <div className="reader-scroll" ref={scrollRef}>
-          <article className="reader-content" ref={contentRef} onMouseUp={handleMouseUp}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
-          </article>
+          {canEdit ? (
+            <article
+              className="reader-content is-editable"
+              ref={contentRef}
+              contentEditable
+              suppressContentEditableWarning
+              spellCheck={false}
+              onInput={handleContentInput}
+              onKeyDown={handleContentKeyDown}
+              onMouseUp={handleMouseUp}
+            />
+          ) : (
+            <article className="reader-content" ref={contentRef} onMouseUp={handleMouseUp}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+            </article>
+          )}
         </div>
 
         {showThoughts && !isStaticReadonly ? (
