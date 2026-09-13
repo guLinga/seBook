@@ -1,14 +1,25 @@
-import type { Annotation, BookDetail, BookMeta, Progress } from '../types'
+import type { BookDetail, BookMeta, Progress } from '../types'
 
 type ManifestItem = {
   id: string
   title: string
   author: string
   file: string
+  importedAt?: string
 }
 
 function booksBase() {
   return `${import.meta.env.BASE_URL}default-books/`
+}
+
+function toBookMeta(item: ManifestItem): BookMeta {
+  return {
+    id: item.id,
+    title: item.title,
+    author: item.author,
+    filename: item.file,
+    importedAt: item.importedAt || '2026-01-01T00:00:00.000Z',
+  }
 }
 
 async function loadManifest() {
@@ -19,13 +30,9 @@ async function loadManifest() {
 
 export async function staticFetchBooks(): Promise<BookMeta[]> {
   const list = await loadManifest()
-  return list.map((item) => ({
-    id: item.id,
-    title: item.title,
-    author: item.author,
-    filename: item.file,
-    importedAt: '2026-01-01T00:00:00.000Z',
-  }))
+  return list
+    .map(toBookMeta)
+    .sort((a, b) => b.importedAt.localeCompare(a.importedAt))
 }
 
 export async function staticFetchBook(id: string): Promise<BookDetail> {
@@ -36,16 +43,12 @@ export async function staticFetchBook(id: string): Promise<BookDetail> {
   if (!res.ok) throw new Error('加载书籍内容失败')
   const content = await res.text()
   return {
-    id: item.id,
-    title: item.title,
-    author: item.author,
-    filename: item.file,
-    importedAt: '2026-01-01T00:00:00.000Z',
+    ...toBookMeta(item),
     content,
   }
 }
 
-export function staticFetchAnnotations(_bookId: string): Promise<Annotation[]> {
+export function staticFetchAnnotations(_bookId: string) {
   return Promise.resolve([])
 }
 

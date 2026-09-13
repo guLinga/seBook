@@ -92,7 +92,11 @@ npm run dev
 ```
 
 - 前端：http://localhost:5173
-- 本地 API：http://localhost:8787（书籍 / 标注 / 进度写入 `data/`）
+- 本地 API：http://localhost:8787
+- **统一书库**：`public/default-books/`（本地导入/删除会改这里的 Markdown 与 `manifest.json`）
+- 标注与阅读进度仍仅保存在本地 `data/annotations`、`data/progress`（线上只读，不使用）
+
+本地改完书单后，`git add public/default-books && git commit && git push`，线上部署后即与本地书单一致。
 
 ---
 
@@ -101,9 +105,11 @@ npm run dev
 线上地址（自定义域名）：https://reSelf.1cor1514.site
 
 GitHub Pages 为**静态只读**站点：
-- 书单与正文直接读取仓库中的 `public/default-books/`
+- 书单与正文直接读取仓库中的 `public/default-books/`（与本地同一目录）
 - 不写入浏览器本地存储
-- 不支持导入、删除、划线/想法（本地 `npm run dev` 仍可完整使用）
+- 不支持导入、删除、划线/想法（请在本地改书库后推送；本地 `npm run dev` 可完整使用标注）
+
+要增删线上书单：本地导入/删除，或直接改 `public/default-books/`，提交推送后重新部署即可。
 
 ### 1. 仓库设置
 
@@ -133,5 +139,3 @@ npm run build:pages
 ```
 
 产物在 `dist/`，包含 `CNAME` 与 SPA 用的 `404.html`。
-
-要增删线上书单：修改 `public/default-books/` 下的 Markdown 与 `manifest.json`，提交后重新部署即可。

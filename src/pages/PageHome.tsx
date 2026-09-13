@@ -65,7 +65,11 @@ function PageHome() {
     <main className="page-home">
       <section className="hero">
         <h1>seRead</h1>
-        <p>{isStaticReadonly ? '精选书单，沉浸阅读' : '导入 Markdown，沉浸阅读与标记'}</p>
+        <p>
+          {isStaticReadonly
+            ? '精选书单，沉浸阅读'
+            : '导入 Markdown；书库与线上共用 public/default-books，推送后同步'}
+        </p>
         <div className="hero-actions">
           {isStaticReadonly ? null : (
             <>
