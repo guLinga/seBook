@@ -8,7 +8,9 @@
     "dev:client": "vite",
     "dev:server": "tsx watch server/index.ts",
     "build": "tsc --noEmit -p tsconfig.json && vite build",
-    "preview": "vite preview"
+    "build:pages": "tsc --noEmit -p tsconfig.json && vite build --mode pages && node scripts/prepare-pages.mjs",
+    "preview": "vite preview",
+    "preview:pages": "vite preview --mode pages"
   },
   "dependencies": {
     "cors": "^2.8.5",

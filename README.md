@@ -93,3 +93,40 @@ npm run dev
 
 - 前端：http://localhost:5173
 - 本地 API：http://localhost:8787（书籍 / 标注 / 进度写入 `data/`）
+
+---
+
+## GitHub Pages 部署
+
+线上地址（自定义域名）：https://reSelf.1cor1514.site
+
+GitHub Pages 为静态托管，线上使用浏览器 IndexedDB 存储书籍/标注/进度（与本地 `data/` 文件互不影响）。
+
+### 1. 仓库设置
+
+1. 打开 GitHub 仓库 `Settings` → `Pages`
+2. **Source** 选择 `GitHub Actions`
+3. **Custom domain** 填写：`reSelf.1cor1514.site`
+4. 建议勾选 **Enforce HTTPS**（DNS 生效后可启用）
+
+### 2. DNS 配置
+
+在域名 `1cor1514.site` 的 DNS 服务商添加：
+
+| 类型 | 主机记录 | 记录值 |
+| --- | --- | --- |
+| CNAME | `reSelf` | `gulinga.github.io` |
+
+（当前仓库 remote 为 `guLinga/seBook`，记录值使用 `gulinga.github.io`）
+
+### 3. 自动部署
+
+推送到 `main` 分支后，Actions 工作流 `Deploy GitHub Pages` 会自动构建并发布。
+
+本地也可手动构建：
+
+```bash
+npm run build:pages
+```
+
+产物在 `dist/`，包含 `CNAME` 与 SPA 用的 `404.html`。

@@ -2,7 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'node:path'
 
+// 自定义域名部署时 base 使用根路径 /
 export default defineConfig({
+  base: '/',
   plugins: [react()],
   resolve: {
     alias: {
