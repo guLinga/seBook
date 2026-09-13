@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { deleteBook, fetchBooks, importBooks } from '../api/books'
+import { isStaticReadonly } from '../config'
 import type { BookMeta } from '../types'
 import { useTheme } from '../hooks/useTheme'
 import ModalConfirm from '../components/ModalConfirm'
@@ -13,7 +14,7 @@ function PageHome() {
   const [deleting, setDeleting] = useState(false)
   const [pendingDelete, setPendingDelete] = useState<BookMeta | null>(null)
   const [error, setError] = useState('')
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [inputEl, setInputEl] = useState<HTMLInputElement | null>(null)
 
   async function loadBooks() {
     setLoading(true)
@@ -33,7 +34,7 @@ function PageHome() {
   }, [])
 
   async function handleImport(files: FileList | null) {
-    if (!files?.length) return
+    if (!files?.length || isStaticReadonly) return
     setError('')
     try {
       await importBooks(files)
@@ -41,12 +42,12 @@ function PageHome() {
     } catch (err) {
       setError(err instanceof Error ? err.message : '导入失败')
     } finally {
-      if (inputRef.current) inputRef.current.value = ''
+      if (inputEl) inputEl.value = ''
     }
   }
 
   async function confirmDelete() {
-    if (!pendingDelete) return
+    if (!pendingDelete || isStaticReadonly) return
     setDeleting(true)
     setError('')
     try {
@@ -64,28 +65,32 @@ function PageHome() {
     <main className="page-home">
       <section className="hero">
         <h1>seRead</h1>
-        <p>导入 Markdown，沉浸阅读与标记</p>
+        <p>{isStaticReadonly ? '精选书单，沉浸阅读' : '导入 Markdown，沉浸阅读与标记'}</p>
         <div className="hero-actions">
-          <button type="button" className="btn-primary" onClick={() => inputRef.current?.click()}>
-            导入 Markdown
-          </button>
+          {isStaticReadonly ? null : (
+            <>
+              <button type="button" className="btn-primary" onClick={() => inputEl?.click()}>
+                导入 Markdown
+              </button>
+              <input
+                ref={setInputEl}
+                type="file"
+                accept=".md,text/markdown"
+                multiple
+                hidden
+                onChange={(e) => void handleImport(e.target.files)}
+              />
+            </>
+          )}
           <button type="button" className="btn-ghost" onClick={toggleTheme}>
             {theme === 'light' ? '深色模式' : '浅色模式'}
           </button>
-          <input
-            ref={inputRef}
-            type="file"
-            accept=".md,text/markdown"
-            multiple
-            hidden
-            onChange={(e) => void handleImport(e.target.files)}
-          />
         </div>
       </section>
 
       <section className="shelf">
         <div className="shelf-head">
-          <h2>我的书架</h2>
+          <h2>{isStaticReadonly ? '书单' : '我的书架'}</h2>
           <span>{books.length} 本</span>
         </div>
 
@@ -94,7 +99,11 @@ function PageHome() {
 
         {!loading && books.length === 0 ? (
           <div className="empty">
-            <p>还没有书籍，点击上方导入 Markdown 文件</p>
+            <p>
+              {isStaticReadonly
+                ? '暂无书籍'
+                : '还没有书籍，点击上方导入 Markdown 文件'}
+            </p>
           </div>
         ) : null}
 
@@ -105,13 +114,15 @@ function PageHome() {
                 <Link to={`/read/${book.id}`} className="cover">
                   <span>{book.title.slice(0, 1)}</span>
                 </Link>
-                <button
-                  type="button"
-                  className="btn-delete"
-                  onClick={() => setPendingDelete(book)}
-                >
-                  删除
-                </button>
+                {isStaticReadonly ? null : (
+                  <button
+                    type="button"
+                    className="btn-delete"
+                    onClick={() => setPendingDelete(book)}
+                  >
+                    删除
+                  </button>
+                )}
               </div>
               <div className="meta">
                 <Link to={`/read/${book.id}`} className="title">
@@ -124,16 +135,18 @@ function PageHome() {
         </div>
       </section>
 
-      <ModalConfirm
-        open={Boolean(pendingDelete)}
-        title="确认删除书籍"
-        message={`确定删除《${pendingDelete?.title || ''}》吗？删除后书籍内容、标注与阅读进度都会一起清除，且无法恢复。`}
-        loading={deleting}
-        onCancel={() => {
-          if (!deleting) setPendingDelete(null)
-        }}
-        onConfirm={() => void confirmDelete()}
-      />
+      {isStaticReadonly ? null : (
+        <ModalConfirm
+          open={Boolean(pendingDelete)}
+          title="确认删除书籍"
+          message={`确定删除《${pendingDelete?.title || ''}》吗？删除后书籍内容、标注与阅读进度都会一起清除，且无法恢复。`}
+          loading={deleting}
+          onCancel={() => {
+            if (!deleting) setPendingDelete(null)
+          }}
+          onConfirm={() => void confirmDelete()}
+        />
+      )}
     </main>
   )
 }

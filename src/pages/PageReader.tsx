@@ -13,6 +13,7 @@ import {
   updateAnnotation,
 } from '../api/books'
 import { useTheme } from '../hooks/useTheme'
+import { isStaticReadonly } from '../config'
 import type { Annotation, AnnotationType, BookDetail, TocItem } from '../types'
 import { HIGHLIGHT_COLORS } from '../types'
 import {
@@ -67,7 +68,7 @@ function PageReader() {
     () => annotations.filter((item) => item.type === 'thought'),
     [annotations],
   )
-  const showToolbar = Boolean(toolbarRect && (selection || editingId))
+  const showToolbar = !isStaticReadonly && Boolean(toolbarRect && (selection || editingId))
   const toolbarMode = editingId ? 'edit' : 'create'
 
   function getHeadingElements() {
@@ -252,6 +253,8 @@ function PageReader() {
   }, [showToolbar])
 
   function handleMouseUp(event: MouseEvent<HTMLElement>) {
+    if (isStaticReadonly) return
+
     const root = contentRef.current
     if (!root) return
 
@@ -399,19 +402,23 @@ function PageReader() {
           </div>
         </div>
         <div className="reader-top-right">
-          <button type="button" className="btn-ghost" onClick={() => setShowThoughts((v) => !v)}>
-            想法
-          </button>
+          {isStaticReadonly ? null : (
+            <button type="button" className="btn-ghost" onClick={() => setShowThoughts((v) => !v)}>
+              想法
+            </button>
+          )}
           <button type="button" className="btn-ghost" onClick={toggleTheme}>
             {theme === 'light' ? '深色' : '浅色'}
           </button>
-          <button
-            type="button"
-            className="btn-ghost btn-danger-text"
-            onClick={() => setShowDeleteBookModal(true)}
-          >
-            删除书籍
-          </button>
+          {isStaticReadonly ? null : (
+            <button
+              type="button"
+              className="btn-ghost btn-danger-text"
+              onClick={() => setShowDeleteBookModal(true)}
+            >
+              删除书籍
+            </button>
+          )}
         </div>
       </div>
 
@@ -430,7 +437,7 @@ function PageReader() {
           </article>
         </div>
 
-        {showThoughts ? (
+        {showThoughts && !isStaticReadonly ? (
           <PanelThoughts
             items={thoughts}
             onJump={jumpToAnnotation}
@@ -473,16 +480,18 @@ function PageReader() {
         />
       ) : null}
 
-      <ModalConfirm
-        open={showDeleteBookModal}
-        title="确认删除书籍"
-        message={`确定删除《${book.title}》吗？删除后书籍内容、标注与阅读进度都会一起清除，且无法恢复。`}
-        loading={deletingBook}
-        onCancel={() => {
-          if (!deletingBook) setShowDeleteBookModal(false)
-        }}
-        onConfirm={() => void handleDeleteBook()}
-      />
+      {isStaticReadonly ? null : (
+        <ModalConfirm
+          open={showDeleteBookModal}
+          title="确认删除书籍"
+          message={`确定删除《${book.title}》吗？删除后书籍内容、标注与阅读进度都会一起清除，且无法恢复。`}
+          loading={deletingBook}
+          onCancel={() => {
+            if (!deletingBook) setShowDeleteBookModal(false)
+          }}
+          onConfirm={() => void handleDeleteBook()}
+        />
+      )}
     </main>
   )
 }

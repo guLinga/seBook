@@ -1,19 +1,12 @@
 import type { Annotation, BookDetail, BookMeta, Progress } from '../types'
+import { isStaticReadonly } from '../config'
 import {
-  localCreateAnnotation,
-  localDeleteAnnotation,
-  localDeleteBook,
-  localFetchAnnotations,
-  localFetchBook,
-  localFetchBooks,
-  localFetchProgress,
-  localImportBooks,
-  localSaveProgress,
-  localUpdateAnnotation,
-  seedDefaultBooksIfNeeded,
-} from '../storage/browser-store'
-
-const useLocalStorage = import.meta.env.VITE_STORAGE_MODE === 'local'
+  staticFetchAnnotations,
+  staticFetchBook,
+  staticFetchBooks,
+  staticFetchProgress,
+  staticSaveProgress,
+} from '../storage/static-books'
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, init)
@@ -24,21 +17,18 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>
 }
 
-export async function fetchBooks() {
-  if (useLocalStorage) {
-    await seedDefaultBooksIfNeeded()
-    return localFetchBooks()
-  }
+export function fetchBooks() {
+  if (isStaticReadonly) return staticFetchBooks()
   return request<BookMeta[]>('/api/books')
 }
 
 export function fetchBook(id: string) {
-  if (useLocalStorage) return localFetchBook(id)
+  if (isStaticReadonly) return staticFetchBook(id)
   return request<BookDetail>(`/api/books/${id}`)
 }
 
 export async function importBooks(files: FileList | File[]) {
-  if (useLocalStorage) return localImportBooks(files)
+  if (isStaticReadonly) throw new Error('线上为只读模式，不支持导入')
   const form = new FormData()
   Array.from(files).forEach((file) => form.append('files', file))
   return request<BookMeta[]>('/api/books/import', {
@@ -48,12 +38,12 @@ export async function importBooks(files: FileList | File[]) {
 }
 
 export function deleteBook(id: string) {
-  if (useLocalStorage) return localDeleteBook(id)
+  if (isStaticReadonly) return Promise.reject(new Error('线上为只读模式，不支持删除'))
   return request<{ ok: boolean }>(`/api/books/${id}`, { method: 'DELETE' })
 }
 
 export function fetchAnnotations(bookId: string) {
-  if (useLocalStorage) return localFetchAnnotations(bookId)
+  if (isStaticReadonly) return staticFetchAnnotations(bookId)
   return request<Annotation[]>(`/api/books/${bookId}/annotations`)
 }
 
@@ -61,7 +51,7 @@ export function createAnnotation(
   bookId: string,
   payload: Omit<Annotation, 'id' | 'bookId' | 'createdAt'>,
 ) {
-  if (useLocalStorage) return localCreateAnnotation(bookId, payload)
+  if (isStaticReadonly) return Promise.reject(new Error('线上为只读模式，不支持标记'))
   return request<Annotation>(`/api/books/${bookId}/annotations`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -74,7 +64,7 @@ export function updateAnnotation(
   annotationId: string,
   payload: Partial<Pick<Annotation, 'type' | 'color' | 'note'>>,
 ) {
-  if (useLocalStorage) return localUpdateAnnotation(bookId, annotationId, payload)
+  if (isStaticReadonly) return Promise.reject(new Error('线上为只读模式，不支持标记'))
   return request<Annotation>(`/api/books/${bookId}/annotations/${annotationId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -83,19 +73,19 @@ export function updateAnnotation(
 }
 
 export function deleteAnnotation(bookId: string, annotationId: string) {
-  if (useLocalStorage) return localDeleteAnnotation(bookId, annotationId)
+  if (isStaticReadonly) return Promise.reject(new Error('线上为只读模式，不支持标记'))
   return request<{ ok: boolean }>(`/api/books/${bookId}/annotations/${annotationId}`, {
     method: 'DELETE',
   })
 }
 
 export function fetchProgress(bookId: string) {
-  if (useLocalStorage) return localFetchProgress(bookId)
+  if (isStaticReadonly) return staticFetchProgress(bookId)
   return request<Progress>(`/api/books/${bookId}/progress`)
 }
 
 export function saveProgress(bookId: string, scrollRatio: number) {
-  if (useLocalStorage) return localSaveProgress(bookId, scrollRatio)
+  if (isStaticReadonly) return staticSaveProgress(bookId, scrollRatio)
   return request<Progress>(`/api/books/${bookId}/progress`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

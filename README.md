@@ -100,7 +100,10 @@ npm run dev
 
 线上地址（自定义域名）：https://reSelf.1cor1514.site
 
-GitHub Pages 为静态托管，线上使用浏览器 IndexedDB 存储书籍/标注/进度（与本地 `data/` 文件互不影响）。
+GitHub Pages 为**静态只读**站点：
+- 书单与正文直接读取仓库中的 `public/default-books/`
+- 不写入浏览器本地存储
+- 不支持导入、删除、划线/想法（本地 `npm run dev` 仍可完整使用）
 
 ### 1. 仓库设置
 
@@ -131,10 +134,4 @@ npm run build:pages
 
 产物在 `dist/`，包含 `CNAME` 与 SPA 用的 `404.html`。
 
-线上首次打开会自动写入默认书（《被讨厌的勇气》《一生的呼台》），数据保存在浏览器 IndexedDB。若曾打开过空书架，可清除该站点的本地数据后刷新，或在控制台执行：
-
-```js
-localStorage.removeItem('seread-defaults-seeded-v1')
-```
-
-然后刷新页面即可重新灌入默认书。
+要增删线上书单：修改 `public/default-books/` 下的 Markdown 与 `manifest.json`，提交后重新部署即可。

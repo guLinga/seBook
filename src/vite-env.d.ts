@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_STORAGE_MODE?: string
+  readonly VITE_STORAGE_MODE?: 'static' | 'local' | string
 }
 
 interface ImportMeta {
