@@ -130,3 +130,11 @@ npm run build:pages
 ```
 
 产物在 `dist/`，包含 `CNAME` 与 SPA 用的 `404.html`。
+
+线上首次打开会自动写入默认书（《被讨厌的勇气》《一生的呼台》），数据保存在浏览器 IndexedDB。若曾打开过空书架，可清除该站点的本地数据后刷新，或在控制台执行：
+
+```js
+localStorage.removeItem('seread-defaults-seeded-v1')
+```
+
+然后刷新页面即可重新灌入默认书。

@@ -10,6 +10,7 @@ import {
   localImportBooks,
   localSaveProgress,
   localUpdateAnnotation,
+  seedDefaultBooksIfNeeded,
 } from '../storage/browser-store'
 
 const useLocalStorage = import.meta.env.VITE_STORAGE_MODE === 'local'
@@ -23,8 +24,11 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>
 }
 
-export function fetchBooks() {
-  if (useLocalStorage) return localFetchBooks()
+export async function fetchBooks() {
+  if (useLocalStorage) {
+    await seedDefaultBooksIfNeeded()
+    return localFetchBooks()
+  }
   return request<BookMeta[]>('/api/books')
 }
 

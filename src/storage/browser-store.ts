@@ -191,3 +191,54 @@ export async function localSaveProgress(bookId: string, scrollRatio: number) {
   await storeRequest('progress', 'readwrite', (store) => store.put(progress))
   return progress
 }
+
+type DefaultBookManifestItem = {
+  id: string
+  title: string
+  author: string
+  file: string
+}
+
+const SEED_FLAG_KEY = 'seread-defaults-seeded-v1'
+
+/** 首次打开（书架为空）时写入内置默认书 */
+export async function seedDefaultBooksIfNeeded() {
+  if (typeof window === 'undefined') return
+  if (localStorage.getItem(SEED_FLAG_KEY)) return
+
+  const existing = await localFetchBooks()
+  if (existing.length > 0) {
+    localStorage.setItem(SEED_FLAG_KEY, '1')
+    return
+  }
+
+  const base = `${import.meta.env.BASE_URL}default-books/`
+  const manifestRes = await fetch(`${base}manifest.json`)
+  if (!manifestRes.ok) throw new Error('加载默认书清单失败')
+  const manifest = (await manifestRes.json()) as DefaultBookManifestItem[]
+
+  for (const item of manifest) {
+    const contentRes = await fetch(`${base}${item.file}`)
+    if (!contentRes.ok) continue
+    const content = await contentRes.text()
+    const { body, data } = parseFrontmatter(content)
+    const title = data.title || item.title || extractTitle(body, item.id)
+    const author = data.author || item.author || '未知作者'
+    const meta: BookMeta = {
+      id: item.id,
+      title,
+      author,
+      filename: `${item.id}.md`,
+      importedAt: new Date().toISOString(),
+    }
+    await storeRequest('books', 'readwrite', (store) => store.put({ ...meta, content }))
+    await storeRequest('annotations', 'readwrite', (store) =>
+      store.put({ bookId: item.id, items: [] }),
+    )
+    await storeRequest('progress', 'readwrite', (store) =>
+      store.put({ bookId: item.id, scrollRatio: 0, updatedAt: new Date().toISOString() }),
+    )
+  }
+
+  localStorage.setItem(SEED_FLAG_KEY, '1')
+}
