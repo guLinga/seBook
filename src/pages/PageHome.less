@@ -1,0 +1,144 @@
+.page-home {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+}
+
+.hero {
+  text-align: center;
+  padding: 48px 16px 40px;
+  background:
+    radial-gradient(circle at top, var(--hero-glow), transparent 55%),
+    linear-gradient(180deg, var(--hero-top), transparent);
+  border-radius: 20px;
+
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(40px, 6vw, 64px);
+    letter-spacing: 0.04em;
+  }
+
+  p {
+    margin: 12px 0 0;
+    color: var(--text-secondary);
+  }
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.shelf {
+  margin-top: 36px;
+}
+
+.shelf-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    font-size: 22px;
+  }
+
+  span {
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.book-card {
+  .cover-wrap {
+    position: relative;
+  }
+
+  .cover {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 240px;
+    border-radius: 12px;
+    background: linear-gradient(160deg, var(--cover-from), var(--cover-to));
+    color: #fff;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-size: 56px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+    transition: transform 0.25s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+  }
+
+  .meta {
+    padding: 12px 4px 0;
+  }
+
+  .title {
+    display: block;
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .author {
+    margin: 6px 0 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+}
+
+.btn-delete {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: rgba(20, 20, 20, 0.72);
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    background: var(--danger);
+  }
+}
+
+.book-card .cover-wrap:hover .btn-delete,
+.book-card .cover-wrap:focus-within .btn-delete {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.empty,
+.muted,
+.error-text {
+  color: var(--text-secondary);
+}
+
+.error-text {
+  color: var(--danger);
+}

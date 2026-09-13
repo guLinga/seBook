@@ -1,0 +1,128 @@
+.page-reader {
+  height: calc(100vh - 52px);
+  display: flex;
+  flex-direction: column;
+}
+
+.reader-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+
+.reader-top-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+
+  .reader-title-block {
+    min-width: 0;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .reader-stats {
+    margin: 4px 0 0;
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+}
+
+.reader-top-right {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-danger-text {
+  color: var(--danger) !important;
+  border-color: color-mix(in srgb, var(--danger) 35%, var(--border)) !important;
+}
+
+.back-link {
+  color: var(--brand);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.reader-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr) auto;
+}
+
+.reader-scroll {
+  position: relative;
+  overflow: auto;
+  background: var(--reader-bg);
+}
+
+.reader-content {
+  position: relative;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 28px 80px;
+  line-height: 1.9;
+  font-size: 17px;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    scroll-margin-top: 0;
+    line-height: 1.35;
+  }
+
+  p {
+    margin: 0 0 1em;
+  }
+
+  mark.mark-layer {
+    border-radius: 2px;
+    padding: 0 1px;
+    cursor: pointer;
+  }
+
+  mark.is-doubt {
+    box-shadow: inset 0 -2px 0 rgba(196, 71, 58, 0.7);
+  }
+
+  mark.is-thought {
+    box-shadow: inset 0 -2px 0 rgba(47, 111, 237, 0.7);
+  }
+
+  mark.is-editing {
+    outline: 2px solid var(--brand);
+    outline-offset: 1px;
+  }
+}
+
+.loading,
+.error-state {
+  padding: 40px 20px;
+}
+
+@media (max-width: 900px) {
+  .reader-body {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-toc {
+    display: none;
+  }
+}
