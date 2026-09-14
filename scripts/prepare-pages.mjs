@@ -16,6 +16,8 @@ const notFoundHtml = path.join(dist, '404.html')
 const cnamePath = path.join(dist, 'CNAME')
 const annotationsSrc = path.join(root, 'data', 'annotations')
 const annotationsDest = path.join(dist, 'annotations')
+const progressSrc = path.join(root, 'data', 'progress')
+const progressDest = path.join(dist, 'progress')
 
 if (!existsSync(indexHtml)) {
   console.error('dist/index.html 不存在，请先执行构建')
@@ -29,17 +31,23 @@ copyFileSync(indexHtml, notFoundHtml)
 const domain = 'reSelf.1cor1514.site'
 writeFileSync(cnamePath, `${domain}\n`, 'utf-8')
 
-// 把本地标注同步进 Pages 产物（只读展示）
-mkdirSync(annotationsDest, { recursive: true })
-if (existsSync(annotationsSrc)) {
-  for (const name of readdirSync(annotationsSrc)) {
+function copyJsonDir(src, dest) {
+  mkdirSync(dest, { recursive: true })
+  if (!existsSync(src)) return 0
+  let count = 0
+  for (const name of readdirSync(src)) {
     if (!name.endsWith('.json')) continue
-    copyFileSync(path.join(annotationsSrc, name), path.join(annotationsDest, name))
+    copyFileSync(path.join(src, name), path.join(dest, name))
+    count += 1
   }
+  return count
 }
 
+// 把本地标注 / 进度同步进 Pages 产物（只读展示）
+const annotationCount = copyJsonDir(annotationsSrc, annotationsDest)
+const progressCount = copyJsonDir(progressSrc, progressDest)
+
 const cname = readFileSync(cnamePath, 'utf-8').trim()
-const annotationCount = existsSync(annotationsDest)
-  ? readdirSync(annotationsDest).filter((name) => name.endsWith('.json')).length
-  : 0
-console.log(`GitHub Pages 已准备：404.html + CNAME (${cname}) + annotations (${annotationCount})`)
+console.log(
+  `GitHub Pages 已准备：404.html + CNAME (${cname}) + annotations (${annotationCount}) + progress (${progressCount})`,
+)

@@ -5,5 +5,3 @@ dist
 data/books/*
 !data/books/.gitkeep
 data/meta.json
-data/progress/*
-!data/progress/.gitkeep

@@ -59,15 +59,25 @@ export async function staticFetchAnnotations(bookId: string): Promise<Annotation
   return (await res.json()) as Annotation[]
 }
 
-export function staticFetchProgress(bookId: string): Promise<Progress> {
-  return Promise.resolve({
-    bookId,
-    scrollRatio: 0,
-    updatedAt: new Date().toISOString(),
-  })
+function progressBase() {
+  return `${import.meta.env.BASE_URL}progress/`
+}
+
+export async function staticFetchProgress(bookId: string): Promise<Progress> {
+  const res = await fetch(`${progressBase()}${bookId}.json`)
+  if (res.status === 404) {
+    return {
+      bookId,
+      scrollRatio: 0,
+      updatedAt: new Date().toISOString(),
+    }
+  }
+  if (!res.ok) throw new Error('加载阅读进度失败')
+  return (await res.json()) as Progress
 }
 
 export function staticSaveProgress(bookId: string, scrollRatio: number): Promise<Progress> {
+  // Pages 只读：进度可展示仓库中的快照，但不能在线写入
   return Promise.resolve({
     bookId,
     scrollRatio,

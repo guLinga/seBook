@@ -93,11 +93,11 @@ npm run dev
 
 - 前端：http://localhost:5173
 - 本地 API：http://localhost:8787
-- **统一书库**：`public/default-books/`（本地导入/删除会改这里的 Markdown 与 `manifest.json`）
-- **标注（划线/疑问/想法）**：保存在 `data/annotations/`，已纳入 Git；换机器 `git pull` 后本地可继续用；Pages 构建时会拷贝进静态站（只读展示）
-- **阅读进度**：仍仅保存在本地 `data/progress`（不进仓库）
+- **统一书库**：`public/default-books/`（本地导入/删除会改这里的 Markdown 与 `manifest.json`，已在 Git 中）
+- **标注（划线/疑问/想法）**：`data/annotations/`，已纳入 Git；Pages 构建时只读拷贝
+- **阅读进度**：`data/progress/`，已纳入 Git；Pages 构建时只读拷贝（线上不能写入新进度）
 
-本地改完书单或标注后，`git add` 相关文件并 `commit && push`，线上部署后书单与标注会一起更新。
+本地改完书单、标注或进度后，`git add` 相关文件并 `commit && push`，换机器 pull 后即可同步。
 
 ---
 
@@ -107,10 +107,10 @@ npm run dev
 
 GitHub Pages 为**静态只读**站点：
 - 书单与正文直接读取仓库中的 `public/default-books/`（与本地同一目录）
-- 标注读取构建时从 `data/annotations/` 拷贝的 JSON（可查看已有划线/想法，不能在线上新增/修改）
-- 不支持导入、删除、在线写标注（请在本地 `npm run dev` 完整编辑后推送）
+- 标注、阅读进度读取构建时从 `data/annotations/`、`data/progress/` 拷贝的 JSON（可查看快照，不能在线上写入）
+- 不支持导入、删除、在线写标注/进度（请在本地 `npm run dev` 完整编辑后推送）
 
-要增删线上书单或更新标注：本地改完后提交推送，重新部署即可。
+要增删线上书单或更新标注/进度：本地改完后提交推送，重新部署即可。
 
 ### 1. 仓库设置
 
