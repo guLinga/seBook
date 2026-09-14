@@ -1,4 +1,11 @@
-import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -7,6 +14,8 @@ const dist = path.join(root, 'dist')
 const indexHtml = path.join(dist, 'index.html')
 const notFoundHtml = path.join(dist, '404.html')
 const cnamePath = path.join(dist, 'CNAME')
+const annotationsSrc = path.join(root, 'data', 'annotations')
+const annotationsDest = path.join(dist, 'annotations')
 
 if (!existsSync(indexHtml)) {
   console.error('dist/index.html 不存在，请先执行构建')
@@ -20,5 +29,17 @@ copyFileSync(indexHtml, notFoundHtml)
 const domain = 'reSelf.1cor1514.site'
 writeFileSync(cnamePath, `${domain}\n`, 'utf-8')
 
+// 把本地标注同步进 Pages 产物（只读展示）
+mkdirSync(annotationsDest, { recursive: true })
+if (existsSync(annotationsSrc)) {
+  for (const name of readdirSync(annotationsSrc)) {
+    if (!name.endsWith('.json')) continue
+    copyFileSync(path.join(annotationsSrc, name), path.join(annotationsDest, name))
+  }
+}
+
 const cname = readFileSync(cnamePath, 'utf-8').trim()
-console.log(`GitHub Pages 已准备：404.html + CNAME (${cname})`)
+const annotationCount = existsSync(annotationsDest)
+  ? readdirSync(annotationsDest).filter((name) => name.endsWith('.json')).length
+  : 0
+console.log(`GitHub Pages 已准备：404.html + CNAME (${cname}) + annotations (${annotationCount})`)

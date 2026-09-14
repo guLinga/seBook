@@ -1,4 +1,4 @@
-import type { BookDetail, BookMeta, Progress } from '../types'
+import type { Annotation, BookDetail, BookMeta, Progress } from '../types'
 
 type ManifestItem = {
   id: string
@@ -10,6 +10,10 @@ type ManifestItem = {
 
 function booksBase() {
   return `${import.meta.env.BASE_URL}default-books/`
+}
+
+function annotationsBase() {
+  return `${import.meta.env.BASE_URL}annotations/`
 }
 
 function toBookMeta(item: ManifestItem): BookMeta {
@@ -48,8 +52,11 @@ export async function staticFetchBook(id: string): Promise<BookDetail> {
   }
 }
 
-export function staticFetchAnnotations(_bookId: string) {
-  return Promise.resolve([])
+export async function staticFetchAnnotations(bookId: string): Promise<Annotation[]> {
+  const res = await fetch(`${annotationsBase()}${bookId}.json`)
+  if (res.status === 404) return []
+  if (!res.ok) throw new Error('加载标注失败')
+  return (await res.json()) as Annotation[]
 }
 
 export function staticFetchProgress(bookId: string): Promise<Progress> {
