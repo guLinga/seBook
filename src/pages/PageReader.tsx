@@ -73,7 +73,7 @@ function buildTocFromHeadings(headings: HTMLElement[]) {
 function PageReader() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
-  const { theme, toggleTheme } = useTheme()
+  const { themeLabel, nextThemeLabel, toggleTheme } = useTheme()
   const contentRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const restoredRef = useRef(false)
@@ -799,8 +799,13 @@ function PageReader() {
               想法
             </button>
           )}
-          <button type="button" className="btn-ghost" onClick={toggleTheme}>
-            {theme === 'light' ? '深色' : '浅色'}
+          <button
+            type="button"
+            className="btn-ghost"
+            onClick={toggleTheme}
+            title={`切换到${nextThemeLabel}模式`}
+          >
+            {themeLabel}
           </button>
           {isStaticReadonly ? null : (
             <button

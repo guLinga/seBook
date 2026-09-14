@@ -8,7 +8,7 @@ import ModalConfirm from '../components/ModalConfirm'
 import './PageHome.less'
 
 function PageHome() {
-  const { theme, toggleTheme } = useTheme()
+  const { themeLabel, nextThemeLabel, toggleTheme } = useTheme()
   const [books, setBooks] = useState<BookMeta[]>([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(false)
@@ -86,8 +86,13 @@ function PageHome() {
               />
             </>
           )}
-          <button type="button" className="btn-ghost" onClick={toggleTheme}>
-            {theme === 'light' ? '深色模式' : '浅色模式'}
+          <button
+            type="button"
+            className="btn-ghost"
+            onClick={toggleTheme}
+            title={`切换到${nextThemeLabel}模式`}
+          >
+            主题 · {themeLabel}
           </button>
         </div>
       </section>

@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
-import { ThemeContext, type ThemeMode } from './hooks/useTheme'
+import {
+  getNextTheme,
+  isThemeMode,
+  THEME_LABELS,
+  ThemeContext,
+  type ThemeMode,
+} from './hooks/useTheme'
 import PageHome from './pages/PageHome'
 import PageReader from './pages/PageReader'
 import './styles/global.less'
@@ -10,7 +16,7 @@ const THEME_KEY = 'seread-theme'
 function App() {
   const [theme, setTheme] = useState<ThemeMode>(() => {
     const saved = localStorage.getItem(THEME_KEY)
-    return saved === 'dark' ? 'dark' : 'light'
+    return isThemeMode(saved) ? saved : 'light'
   })
 
   useEffect(() => {
@@ -21,7 +27,9 @@ function App() {
   const value = useMemo(
     () => ({
       theme,
-      toggleTheme: () => setTheme((prev) => (prev === 'light' ? 'dark' : 'light')),
+      toggleTheme: () => setTheme((prev) => getNextTheme(prev)),
+      themeLabel: THEME_LABELS[theme],
+      nextThemeLabel: THEME_LABELS[getNextTheme(theme)],
     }),
     [theme],
   )

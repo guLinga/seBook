@@ -99,12 +99,19 @@
 
 .reader-content {
   position: relative;
-  max-width: 760px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 40px 28px 80px;
-  line-height: 1.9;
-  font-size: 17px;
+  padding: 44px 32px 96px;
+  font-family: var(--font-reader);
+  font-size: var(--reader-size);
+  line-height: var(--reader-leading);
+  letter-spacing: var(--reader-tracking);
+  font-weight: 400;
+  color: var(--text);
   outline: none;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  -webkit-font-smoothing: antialiased;
 
   &.is-editable {
     min-height: 60vh;
@@ -118,11 +125,54 @@
   h5,
   h6 {
     scroll-margin-top: 0;
-    line-height: 1.35;
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    color: var(--text);
+  }
+
+  h1 {
+    font-size: 1.65em;
+    margin: 1.4em 0 0.7em;
+  }
+
+  h2 {
+    font-size: 1.38em;
+    margin: 1.35em 0 0.65em;
+  }
+
+  h3 {
+    font-size: 1.2em;
+    margin: 1.25em 0 0.55em;
+  }
+
+  h4,
+  h5,
+  h6 {
+    font-size: 1.08em;
+    margin: 1.2em 0 0.5em;
   }
 
   p {
-    margin: 0 0 1em;
+    margin: 0 0 var(--reader-paragraph-gap);
+  }
+
+  li {
+    margin: 0.25em 0;
+  }
+
+  blockquote {
+    margin: 1.1em 0;
+    padding: 0.2em 0 0.2em 1em;
+    border-left: 3px solid color-mix(in srgb, var(--brand) 45%, var(--border));
+    color: var(--text-secondary);
+  }
+
+  code {
+    font-family: 'Source Sans 3', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.92em;
+    letter-spacing: 0;
   }
 
   mark.mark-layer {
