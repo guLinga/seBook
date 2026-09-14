@@ -152,7 +152,7 @@ export async function localCreateAnnotation(
 export async function localUpdateAnnotation(
   bookId: string,
   annotationId: string,
-  payload: Partial<Pick<Annotation, 'type' | 'color' | 'note'>>,
+  payload: Partial<Pick<Annotation, 'type' | 'color' | 'note' | 'text' | 'startOffset' | 'endOffset'>>,
 ) {
   const items = await localFetchAnnotations(bookId)
   const index = items.findIndex((item) => item.id === annotationId)
@@ -163,10 +163,18 @@ export async function localUpdateAnnotation(
     type: payload.type || current.type,
     color: payload.color || current.color,
     note: payload.note !== undefined ? payload.note || undefined : current.note,
+    text: payload.text !== undefined ? payload.text : current.text,
+    startOffset: payload.startOffset !== undefined ? payload.startOffset : current.startOffset,
+    endOffset: payload.endOffset !== undefined ? payload.endOffset : current.endOffset,
   }
   items[index] = next
   await storeRequest('annotations', 'readwrite', (store) => store.put({ bookId, items }))
   return next
+}
+
+export async function localSaveAnnotations(bookId: string, items: Annotation[]) {
+  await storeRequest('annotations', 'readwrite', (store) => store.put({ bookId, items }))
+  return items
 }
 
 export async function localDeleteAnnotation(bookId: string, annotationId: string) {

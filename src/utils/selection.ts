@@ -175,3 +175,65 @@ function getLastTextNode(root: HTMLElement) {
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value))
 }
+
+function sortMarksByDocumentOrder(marks: HTMLElement[]) {
+  return [...marks].sort((a, b) => {
+    if (a === b) return 0
+    const position = a.compareDocumentPosition(b)
+    if (position & Node.DOCUMENT_POSITION_FOLLOWING) return -1
+    if (position & Node.DOCUMENT_POSITION_PRECEDING) return 1
+    return 0
+  })
+}
+
+function getFirstTextNode(root: Node) {
+  if (root.nodeType === Node.TEXT_NODE) return root as Text
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+  return walker.nextNode() as Text | null
+}
+
+function getLastTextNodeIn(root: Node) {
+  if (root.nodeType === Node.TEXT_NODE) return root as Text
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+  let current = walker.nextNode() as Text | null
+  let last: Text | null = null
+  while (current) {
+    last = current
+    current = walker.nextNode() as Text | null
+  }
+  return last
+}
+
+/** 根据同一 annotationId 的 mark 片段，读出当前纯文本起止偏移 */
+export function getOffsetsFromAnnotationMarks(root: HTMLElement, marks: HTMLElement[]) {
+  if (!marks.length) return null
+
+  const sorted = sortMarksByDocumentOrder(marks)
+  const firstText = getFirstTextNode(sorted[0])
+  const lastText = getLastTextNodeIn(sorted[sorted.length - 1])
+  if (!firstText || !lastText) return null
+
+  const startOffset = getTextOffsetInRoot(root, firstText, 0)
+  const endOffset = getTextOffsetInRoot(root, lastText, lastText.textContent?.length || 0)
+  if (endOffset <= startOffset) return null
+
+  const text = sorted
+    .map((mark) => mark.textContent || '')
+    .join('')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  return { startOffset, endOffset, text }
+}
+
+export function groupAnnotationMarks(root: HTMLElement) {
+  const byId = new Map<string, HTMLElement[]>()
+  root.querySelectorAll<HTMLElement>('.mark-layer[data-annotation-id]').forEach((mark) => {
+    const id = mark.dataset.annotationId
+    if (!id) return
+    const list = byId.get(id)
+    if (list) list.push(mark)
+    else byId.set(id, [mark])
+  })
+  return byId
+}

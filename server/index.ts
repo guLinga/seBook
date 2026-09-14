@@ -253,6 +253,18 @@ app.post('/api/books/:id/annotations', async (req, res) => {
   res.json(item)
 })
 
+app.put('/api/books/:id/annotations', async (req, res) => {
+  const file = path.join(annotationsDir, `${req.params.id}.json`)
+  const body = req.body
+  if (!Array.isArray(body)) {
+    res.status(400).json({ message: '标注数据无效' })
+    return
+  }
+  const items = body as Annotation[]
+  await fs.writeFile(file, JSON.stringify(items, null, 2), 'utf-8')
+  res.json(items)
+})
+
 app.put('/api/books/:id/annotations/:annotationId', async (req, res) => {
   const file = path.join(annotationsDir, `${req.params.id}.json`)
   let list: Annotation[] = []
@@ -266,13 +278,18 @@ app.put('/api/books/:id/annotations/:annotationId', async (req, res) => {
     res.status(404).json({ message: '标注不存在' })
     return
   }
-  const body = req.body as Partial<Pick<Annotation, 'type' | 'color' | 'note'>>
+  const body = req.body as Partial<
+    Pick<Annotation, 'type' | 'color' | 'note' | 'text' | 'startOffset' | 'endOffset'>
+  >
   const current = list[index]
   const nextItem: Annotation = {
     ...current,
     type: body.type || current.type,
     color: body.color || current.color,
     note: body.note !== undefined ? body.note || undefined : current.note,
+    text: body.text !== undefined ? body.text : current.text,
+    startOffset: body.startOffset !== undefined ? body.startOffset : current.startOffset,
+    endOffset: body.endOffset !== undefined ? body.endOffset : current.endOffset,
   }
   list[index] = nextItem
   await fs.writeFile(file, JSON.stringify(list, null, 2), 'utf-8')

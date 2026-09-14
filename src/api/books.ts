@@ -71,13 +71,23 @@ export function createAnnotation(
 export function updateAnnotation(
   bookId: string,
   annotationId: string,
-  payload: Partial<Pick<Annotation, 'type' | 'color' | 'note'>>,
+  payload: Partial<Pick<Annotation, 'type' | 'color' | 'note' | 'text' | 'startOffset' | 'endOffset'>>,
 ) {
   if (isStaticReadonly) return Promise.reject(new Error('线上为只读模式，不支持标记'))
   return request<Annotation>(`/api/books/${bookId}/annotations/${annotationId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
+  })
+}
+
+/** 整表写回标注（用于正文编辑后批量同步偏移） */
+export function saveAnnotations(bookId: string, items: Annotation[]) {
+  if (isStaticReadonly) return Promise.reject(new Error('线上为只读模式，不支持标记'))
+  return request<Annotation[]>(`/api/books/${bookId}/annotations`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(items),
   })
 }
 

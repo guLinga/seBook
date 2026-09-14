@@ -9,6 +9,7 @@ import {
   fetchAnnotations,
   fetchBook,
   fetchProgress,
+  saveAnnotations,
   saveProgress,
   updateAnnotation,
   updateBookContent,
@@ -30,7 +31,13 @@ import {
   serializeEditableHtml,
 } from '../utils/markdown-html'
 import { tryApplyMarkdownShortcutOnSpace, tryBreakHeadingOnEnter } from '../utils/markdown-shortcuts'
-import { getRangeFromOffsets, getTextOffsetInRoot, wrapRangeWithMark } from '../utils/selection'
+import {
+  getOffsetsFromAnnotationMarks,
+  getRangeFromOffsets,
+  getTextOffsetInRoot,
+  groupAnnotationMarks,
+  wrapRangeWithMark,
+} from '../utils/selection'
 import PanelToc from '../components/PanelToc'
 import PanelThoughts from '../components/PanelThoughts'
 import ToolbarAnnotation from '../components/ToolbarAnnotation'
@@ -79,6 +86,8 @@ function PageReader() {
   const contentEpochRef = useRef('')
   const skipBootstrapRef = useRef(false)
   const bookRef = useRef<BookDetail | null>(null)
+  const annotationsRef = useRef<Annotation[]>([])
+  const annotationSaveTimer = useRef<number | null>(null)
 
   const [book, setBook] = useState<BookDetail | null>(null)
   const [annotations, setAnnotations] = useState<Annotation[]>([])
@@ -100,6 +109,7 @@ function PageReader() {
   const [contentRevision, setContentRevision] = useState(0)
 
   bookRef.current = book
+  annotationsRef.current = annotations
 
   const markdown = useMemo(
     () => (isStaticReadonly && book ? stripFrontmatter(book.content) : liveMarkdown),
@@ -182,10 +192,58 @@ function PageReader() {
     setToolbarRect(rect)
   }
 
+  function persistAnnotationOffsets(next: Annotation[]) {
+    if (annotationSaveTimer.current) window.clearTimeout(annotationSaveTimer.current)
+    annotationSaveTimer.current = window.setTimeout(() => {
+      void saveAnnotations(id, next).catch(() => {
+        // 偏移同步失败不打断正文编辑；下次编辑或刷新会再试
+      })
+    }, 700)
+  }
+
+  /** 正文插入/删除后，按仍挂在 DOM 上的划线重算偏移，避免重点/疑问/想法错位 */
+  function syncAnnotationOffsetsFromDom(root: HTMLElement) {
+    const current = annotationsRef.current
+    if (!current.length) return
+
+    const byId = groupAnnotationMarks(root)
+    let changed = false
+    const next = current.map((item) => {
+      const marks = byId.get(item.id)
+      if (!marks?.length) return item
+
+      const offsets = getOffsetsFromAnnotationMarks(root, marks)
+      if (!offsets) return item
+      if (
+        offsets.startOffset === item.startOffset &&
+        offsets.endOffset === item.endOffset &&
+        offsets.text === item.text
+      ) {
+        return item
+      }
+
+      changed = true
+      return {
+        ...item,
+        startOffset: offsets.startOffset,
+        endOffset: offsets.endOffset,
+        text: offsets.text || item.text,
+      }
+    })
+
+    if (!changed) return
+    annotationsRef.current = next
+    setAnnotations(next)
+    persistAnnotationOffsets(next)
+  }
+
   function scheduleContentSaveFromDom() {
     const root = contentRef.current
     const current = bookRef.current
     if (!root || !current || !canEdit) return
+
+    // 必须在可能触发划线重绘之前同步偏移（仍以 DOM mark 为准）
+    syncAnnotationOffsetsFromDom(root)
 
     const body = serializeEditableHtml(root)
     const full = mergeFrontmatter(current.content, body)
@@ -234,6 +292,10 @@ function PageReader() {
     void load()
     return () => {
       cancelled = true
+      if (annotationSaveTimer.current) {
+        window.clearTimeout(annotationSaveTimer.current)
+        annotationSaveTimer.current = null
+      }
     }
   }, [id, markSynced])
 
@@ -271,20 +333,70 @@ function PageReader() {
     const root = contentRef.current
     if (!root) return
 
-    root.querySelectorAll('.mark-layer').forEach((node) => {
-      const parent = node.parentNode
-      if (!parent) return
-      while (node.firstChild) parent.insertBefore(node.firstChild, node)
-      parent.removeChild(node)
-      parent.normalize()
-    })
-
     getHeadingElements().forEach((heading, index) => {
       const tocId = toc[index]?.id
       if (tocId) {
         heading.id = tocId
         heading.dataset.tocIndex = String(index)
       }
+    })
+
+    const visible = annotations.filter((item) => item.endOffset > item.startOffset)
+    const byId = groupAnnotationMarks(root)
+    const sameIds =
+      byId.size === visible.length && visible.every((item) => byId.has(item.id))
+
+    // DOM 已有完整划线：原地改样式并校准偏移，避免 unwrap 后用旧偏移重绘错位
+    if (sameIds) {
+      let offsetsChanged = false
+      const next = annotations.map((item) => {
+        const marks = byId.get(item.id)
+        if (!marks?.length) return item
+
+        for (const mark of marks) {
+          mark.className = `mark-layer mark-${item.type}`
+          mark.style.backgroundColor = `${item.color}88`
+          mark.dataset.annotationId = item.id
+          mark.dataset.color = item.color
+          mark.contentEditable = 'false'
+          mark.classList.toggle('is-doubt', item.type === 'doubt')
+          mark.classList.toggle('is-thought', item.type === 'thought')
+          mark.classList.toggle('is-editing', editingId === item.id)
+        }
+
+        const offsets = getOffsetsFromAnnotationMarks(root, marks)
+        if (
+          !offsets ||
+          (offsets.startOffset === item.startOffset &&
+            offsets.endOffset === item.endOffset &&
+            (!offsets.text || offsets.text === item.text))
+        ) {
+          return item
+        }
+
+        offsetsChanged = true
+        return {
+          ...item,
+          startOffset: offsets.startOffset,
+          endOffset: offsets.endOffset,
+          text: offsets.text || item.text,
+        }
+      })
+
+      if (offsetsChanged) {
+        annotationsRef.current = next
+        setAnnotations(next)
+        persistAnnotationOffsets(next)
+      }
+      return
+    }
+
+    root.querySelectorAll('.mark-layer').forEach((node) => {
+      const parent = node.parentNode
+      if (!parent) return
+      while (node.firstChild) parent.insertBefore(node.firstChild, node)
+      parent.removeChild(node)
+      parent.normalize()
     })
 
     if (!annotations.length) return
@@ -299,6 +411,7 @@ function PageReader() {
         mark.className = `mark-layer mark-${item.type}`
         mark.style.backgroundColor = `${item.color}88`
         mark.dataset.annotationId = item.id
+        mark.dataset.color = item.color
         mark.contentEditable = 'false'
         if (item.type === 'doubt') mark.classList.add('is-doubt')
         if (item.type === 'thought') mark.classList.add('is-thought')
@@ -425,13 +538,27 @@ function PageReader() {
 
     function onPageHide() {
       flushProgress()
-      if (canEdit) void flushContentSave()
+      if (canEdit) {
+        void flushContentSave()
+        if (annotationSaveTimer.current) {
+          window.clearTimeout(annotationSaveTimer.current)
+          annotationSaveTimer.current = null
+          void saveAnnotations(id, annotationsRef.current).catch(() => {})
+        }
+      }
     }
 
     function onVisibilityChange() {
       if (document.visibilityState === 'hidden') {
         flushProgress()
-        if (canEdit) void flushContentSave()
+        if (canEdit) {
+          void flushContentSave()
+          if (annotationSaveTimer.current) {
+            window.clearTimeout(annotationSaveTimer.current)
+            annotationSaveTimer.current = null
+            void saveAnnotations(id, annotationsRef.current).catch(() => {})
+          }
+        }
       }
     }
 
@@ -534,6 +661,9 @@ function PageReader() {
 
   async function submitAnnotation(type: AnnotationType, note?: string) {
     if (!selection) return
+    const root = contentRef.current
+    if (root) syncAnnotationOffsetsFromDom(root)
+
     const item = await createAnnotation(id, {
       type,
       color,
