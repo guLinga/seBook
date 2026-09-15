@@ -117,6 +117,39 @@ function convertToList(block: HTMLElement, listTag: 'ul' | 'ol', markerLength: n
   else placeCaretAtStart(li)
 }
 
+/** 标题开头按 Backspace：降为正文段落 */
+export function tryConvertHeadingToParagraphOnBackspace(
+  root: HTMLElement,
+  event: KeyboardEvent,
+): boolean {
+  if (event.key !== 'Backspace' || event.metaKey || event.ctrlKey || event.altKey) return false
+
+  const selection = window.getSelection()
+  if (!selection || !selection.isCollapsed || selection.rangeCount === 0) return false
+
+  const range = selection.getRangeAt(0)
+  if (!root.contains(range.startContainer)) return false
+
+  const block = getBlockElement(range.startContainer, root)
+  if (!block || !/^H[1-6]$/i.test(block.tagName)) return false
+  if (block.closest('.mark-layer')) return false
+
+  // 光标必须在标题最开头
+  if (getPrefix(block, range).length > 0) return false
+
+  event.preventDefault()
+
+  const p = document.createElement('p')
+  while (block.firstChild) p.appendChild(block.firstChild)
+  if (!(p.textContent || '').trim()) {
+    p.textContent = ''
+    p.appendChild(document.createElement('br'))
+  }
+  block.replaceWith(p)
+  placeCaretAtStart(p)
+  return true
+}
+
 /** 标题中回车：拆出新段落，避免继续生成同级标题 */
 export function tryBreakHeadingOnEnter(root: HTMLElement, event: KeyboardEvent): boolean {
   if (event.key !== 'Enter' || event.shiftKey) return false
@@ -131,6 +164,15 @@ export function tryBreakHeadingOnEnter(root: HTMLElement, event: KeyboardEvent):
   if (!block || !/^H[1-6]$/i.test(block.tagName)) return false
 
   event.preventDefault()
+
+  // 空标题回车：直接变成正文，避免留下空标题
+  if (!(block.textContent || '').trim()) {
+    const p = document.createElement('p')
+    p.appendChild(document.createElement('br'))
+    block.replaceWith(p)
+    placeCaretAtStart(p)
+    return true
+  }
 
   const afterRange = document.createRange()
   afterRange.selectNodeContents(block)

@@ -30,7 +30,7 @@ import {
   mergeFrontmatter,
   serializeEditableHtml,
 } from '../utils/markdown-html'
-import { tryApplyMarkdownShortcutOnSpace, tryBreakHeadingOnEnter } from '../utils/markdown-shortcuts'
+import { tryApplyMarkdownShortcutOnSpace, tryBreakHeadingOnEnter, tryConvertHeadingToParagraphOnBackspace } from '../utils/markdown-shortcuts'
 import {
   getOffsetsFromAnnotationMarks,
   getRangeFromOffsets,
@@ -594,6 +594,11 @@ function PageReader() {
     if (!canEdit) return
     const root = contentRef.current
     if (!root) return
+
+    if (tryConvertHeadingToParagraphOnBackspace(root, event.nativeEvent)) {
+      scheduleContentSaveFromDom()
+      return
+    }
 
     if (tryBreakHeadingOnEnter(root, event.nativeEvent)) {
       scheduleContentSaveFromDom()
