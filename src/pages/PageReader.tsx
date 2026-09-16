@@ -32,6 +32,7 @@ import {
 } from '../utils/markdown-html'
 import { tryApplyMarkdownShortcutOnSpace, tryBreakHeadingOnEnter, tryConvertHeadingToParagraphOnBackspace } from '../utils/markdown-shortcuts'
 import {
+  decorateAnnotationMarkBounds,
   getOffsetsFromAnnotationMarks,
   getRangeFromOffsets,
   getTextOffsetInRoot,
@@ -356,6 +357,7 @@ function PageReader() {
         for (const mark of marks) {
           mark.className = `mark-layer mark-${item.type}`
           mark.style.backgroundColor = `${item.color}88`
+          mark.style.setProperty('--mark-accent', item.color)
           mark.dataset.annotationId = item.id
           mark.dataset.color = item.color
           mark.contentEditable = 'false'
@@ -363,6 +365,7 @@ function PageReader() {
           mark.classList.toggle('is-thought', item.type === 'thought')
           mark.classList.toggle('is-editing', editingId === item.id)
         }
+        decorateAnnotationMarkBounds(marks)
 
         const offsets = getOffsetsFromAnnotationMarks(root, marks)
         if (
@@ -410,6 +413,7 @@ function PageReader() {
         const mark = document.createElement('mark')
         mark.className = `mark-layer mark-${item.type}`
         mark.style.backgroundColor = `${item.color}88`
+        mark.style.setProperty('--mark-accent', item.color)
         mark.dataset.annotationId = item.id
         mark.dataset.color = item.color
         mark.contentEditable = 'false'
@@ -418,6 +422,10 @@ function PageReader() {
         if (editingId === item.id) mark.classList.add('is-editing')
         return mark
       })
+      const created = root.querySelectorAll<HTMLElement>(
+        `.mark-layer[data-annotation-id="${item.id}"]`,
+      )
+      decorateAnnotationMarkBounds([...created])
     }
   }, [annotations, editingId, toc, contentRevision])
 

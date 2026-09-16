@@ -176,9 +176,46 @@
   }
 
   mark.mark-layer {
+    position: relative;
     border-radius: 2px;
-    padding: 0 1px;
+    padding: 0 2px;
     cursor: pointer;
+
+    // 固定高对比起止边，与粉色/蓝绿等高亮底色区分
+    &.is-mark-start::before,
+    &.is-mark-end::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      bottom: -2px;
+      width: 9px;
+      pointer-events: none;
+      box-sizing: border-box;
+      border-color: var(--mark-bound);
+      background: color-mix(in srgb, var(--mark-bound) 22%, transparent);
+      opacity: 1;
+      z-index: 1;
+    }
+
+    &.is-mark-start::before {
+      left: -2px;
+      border-left: 3px solid;
+      border-top: 3px solid;
+      border-bottom: 3px solid;
+      border-radius: 4px 0 0 4px;
+    }
+
+    &.is-mark-end::after {
+      right: -2px;
+      border-right: 3px solid;
+      border-top: 3px solid;
+      border-bottom: 3px solid;
+      border-radius: 0 4px 4px 0;
+    }
+
+    &.is-mark-start.is-mark-end {
+      border-radius: 3px;
+    }
   }
 
   mark.is-doubt {

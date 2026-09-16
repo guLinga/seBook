@@ -186,6 +186,17 @@ function sortMarksByDocumentOrder(marks: HTMLElement[]) {
   })
 }
 
+/** 给同一标注的多个 mark 片段标上起止，便于相邻划线区分 */
+export function decorateAnnotationMarkBounds(marks: HTMLElement[]) {
+  if (!marks.length) return
+  const sorted = sortMarksByDocumentOrder(marks)
+  for (const mark of sorted) {
+    mark.classList.remove('is-mark-start', 'is-mark-end')
+  }
+  sorted[0].classList.add('is-mark-start')
+  sorted[sorted.length - 1].classList.add('is-mark-end')
+}
+
 function getFirstTextNode(root: Node) {
   if (root.nodeType === Node.TEXT_NODE) return root as Text
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
