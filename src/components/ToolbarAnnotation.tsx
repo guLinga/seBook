@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import type { AnnotationType } from '../types'
 import { HIGHLIGHT_COLORS } from '../types'
 import './ToolbarAnnotation.less'
@@ -70,6 +70,26 @@ function ToolbarAnnotation({
   const [dragging, setDragging] = useState(false)
 
   const showNoteBox = pendingType !== null || (mode === 'edit' && activeType !== 'highlight')
+
+  function handleNoteKeyDown(event: ReactKeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      event.stopPropagation()
+      onCancel()
+      return
+    }
+
+    if (event.key === 'Enter' && event.shiftKey && !event.nativeEvent.isComposing) {
+      event.preventDefault()
+      event.stopPropagation()
+      if (mode === 'edit') {
+        onSaveEdit?.()
+        return
+      }
+      if (pendingType === 'doubt') onConfirmDoubt()
+      else if (pendingType === 'thought') onConfirmThought()
+    }
+  }
 
   useEffect(() => {
     setPos(getDefaultPos(rect))
@@ -174,11 +194,14 @@ function ToolbarAnnotation({
           <textarea
             value={noteDraft}
             onChange={(e) => onNoteDraftChange(e.target.value)}
+            onKeyDown={handleNoteKeyDown}
             placeholder={
               (pendingType || activeType) === 'doubt' ? '写下疑问（可选）' : '写下你的想法'
             }
             rows={3}
+            autoFocus
           />
+          <p className="note-hint">Esc 关闭不保存 · Shift+Enter 保存并关闭</p>
         </div>
       ) : null}
 
