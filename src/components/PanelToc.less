@@ -6,11 +6,34 @@
   background: var(--toc-bg);
   padding: 18px 12px 24px;
 
-  h2 {
+  .toc-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
     margin: 0 8px 8px;
+  }
+
+  h2 {
+    margin: 0;
     font-size: 14px;
     color: var(--text-secondary);
     font-weight: 600;
+  }
+
+  .toc-global-toggle {
+    flex-shrink: 0;
+    border: 0;
+    background: transparent;
+    color: var(--brand);
+    cursor: pointer;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1.4;
+
+    &:hover {
+      opacity: 0.85;
+    }
   }
 
   .toc-stats {
@@ -33,40 +56,96 @@
   }
 }
 
+.toc-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover,
+  &.active {
+    background: color-mix(in srgb, var(--brand) 12%, transparent);
+
+    .toc-item,
+    .toc-twist {
+      color: var(--text);
+    }
+  }
+
+  &.level-1 .toc-item {
+    font-weight: 600;
+  }
+
+  &.level-2 {
+    padding-left: 8px;
+  }
+
+  &.level-3 {
+    padding-left: 18px;
+
+    .toc-item {
+      font-size: 13px;
+    }
+  }
+
+  &.level-4,
+  &.level-5,
+  &.level-6 {
+    padding-left: 28px;
+
+    .toc-item {
+      font-size: 13px;
+    }
+  }
+}
+
+.toc-twist,
+.toc-twist-spacer {
+  flex-shrink: 0;
+  width: 22px;
+  height: 32px;
+}
+
+.toc-twist {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  border-radius: 6px;
+
+  &:hover {
+    background: color-mix(in srgb, var(--brand) 10%, transparent);
+  }
+}
+
+.toc-twist-icon {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 0 5px 7px;
+  border-color: transparent transparent transparent currentColor;
+  transform: rotate(90deg);
+  transition: transform 0.15s ease;
+}
+
+.toc-twist.is-collapsed .toc-twist-icon {
+  transform: rotate(0deg);
+}
+
 .toc-item {
+  flex: 1;
+  min-width: 0;
   text-align: left;
   border: 0;
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
   border-radius: 8px;
-  padding: 8px 10px;
+  padding: 8px 8px 8px 2px;
   line-height: 1.4;
-  transition: background 0.15s ease, color 0.15s ease;
-
-  &:hover,
-  &.active {
-    background: color-mix(in srgb, var(--brand) 12%, transparent);
-    color: var(--text);
-  }
-
-  &.level-1 {
-    font-weight: 600;
-  }
-
-  &.level-2 {
-    padding-left: 18px;
-  }
-
-  &.level-3 {
-    padding-left: 28px;
-    font-size: 13px;
-  }
-
-  &.level-4,
-  &.level-5,
-  &.level-6 {
-    padding-left: 38px;
-    font-size: 13px;
-  }
 }
