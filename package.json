@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -k \"npm:dev:server\" \"npm:dev:client\"",
+    "dev": "node scripts/kill-dev-ports.mjs && concurrently -k \"npm:dev:server\" \"npm:dev:client\"",
     "open": "npm run dev:server & npm run dev:client",
     "dev:client": "vite",
     "dev:server": "tsx watch server/index.ts",
