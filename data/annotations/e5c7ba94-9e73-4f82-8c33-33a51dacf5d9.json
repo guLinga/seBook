@@ -1220,5 +1220,607 @@
     "startOffset": 33978,
     "endOffset": 33987,
     "createdAt": "2026-09-19T15:54:16.900Z"
+  },
+  {
+    "id": "d8251242-ecf3-42a2-8c9d-e109efc51516",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "义人受苦的问题",
+    "startOffset": 38654,
+    "endOffset": 38661,
+    "createdAt": "2026-09-20T14:45:06.350Z"
+  },
+  {
+    "id": "19247ea7-6b24-4872-a588-e4e9c296dd27",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "约伯记的整个论题徘徊于神的公正，与义人的正直这两个极端之间，而由这两极衍生出来的问题，则围绕在这两极的周围，诸如：邪恶的奥秘、恶人为何昌盛，以及义人受苦等",
+    "startOffset": 38907,
+    "endOffset": 38984,
+    "createdAt": "2026-09-20T14:46:31.859Z"
+  },
+  {
+    "id": "ad8eb4bf-e61a-4db8-aeea-cee1a2f7a699",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#f8b4b4",
+    "text": "（约伯）必须降服在神大能的旨意下，承认人有人的义，也信服神有神的义。当二者不能和谐时，并非神的义容不下人的义，而是神的义超越了人的义，远非人所能渗透",
+    "startOffset": 39140,
+    "endOffset": 39214,
+    "createdAt": "2026-09-20T14:47:22.625Z"
+  },
+  {
+    "id": "978cb5bd-1bc5-4ec6-a1a1-5fa9df6b7576",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#f8b4b4",
+    "text": "敍述约伯的心路历程，展现约伯的思考层次，并协助神学问题之解决的本论，才是约伯记中最重要的部份",
+    "startOffset": 39526,
+    "endOffset": 39572,
+    "createdAt": "2026-09-20T14:48:56.238Z"
+  },
+  {
+    "id": "9ac5a0c9-094a-4ad6-a533-2f827e699347",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "thought",
+    "color": "#93c5fd",
+    "text": "中心论题",
+    "note": "论点：义人受苦",
+    "startOffset": 38618,
+    "endOffset": 38622,
+    "createdAt": "2026-09-20T14:50:21.808Z"
+  },
+  {
+    "id": "5df9d83a-5d6b-4928-bebf-be7f45f0b7b0",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#f8b4b4",
+    "text": "约伯记呈现了一个极端受苦的实例，而且正由于其真实性（以及主人翁约伯极深的信仰），使其成为历世历代那些受苦之人，得安慰和信心重建的源泉。人可以和约伯这位受苦的圣徒深深认同。",
+    "startOffset": 40118,
+    "endOffset": 40203,
+    "createdAt": "2026-09-20T14:51:46.278Z"
+  },
+  {
+    "id": "cb5293b6-be32-468d-9ed9-14f80bf4cafc",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "约伯记写作的目的，是要探索在这世界上，神公正的广大领域及其中的奥秘。",
+    "startOffset": 39917,
+    "endOffset": 39951,
+    "createdAt": "2026-09-20T14:51:56.121Z"
+  },
+  {
+    "id": "17fabbec-14ad-4835-b1d1-027692acb912",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "thought",
+    "color": "#93c5fd",
+    "text": "目的",
+    "note": "论点：约伯记写作的目的，是要探索在这世界上，神公正的广大领域及其中的奥秘。",
+    "startOffset": 39891,
+    "endOffset": 39893,
+    "createdAt": "2026-09-20T14:52:06.857Z"
+  },
+  {
+    "id": "7aedfbf7-47b6-4a15-928a-79b0daf62850",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#86efac",
+    "text": "列祖时期",
+    "startOffset": 40474,
+    "endOffset": 40478,
+    "createdAt": "2026-09-20T14:53:46.620Z"
+  },
+  {
+    "id": "f81f1e7f-6e11-4505-920b-950b028ece6c",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#86efac",
+    "text": "所罗门时期",
+    "startOffset": 40676,
+    "endOffset": 40681,
+    "createdAt": "2026-09-20T14:53:57.869Z"
+  },
+  {
+    "id": "daa02ddb-0432-4985-802d-52e33a31aba1",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#86efac",
+    "text": "介于所罗门与被掳到巴比伦的王国时期",
+    "startOffset": 40701,
+    "endOffset": 40718,
+    "createdAt": "2026-09-20T14:54:23.987Z"
+  },
+  {
+    "id": "484242cf-d0f0-4b4c-aac8-066f32078e54",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#86efac",
+    "text": "被掳时期",
+    "startOffset": 40919,
+    "endOffset": 40923,
+    "createdAt": "2026-09-20T14:54:41.635Z"
+  },
+  {
+    "id": "df4ef2f9-6c18-4c8c-8776-75bef56d5cd5",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#86efac",
+    "text": "被掳归回的早期",
+    "startOffset": 41183,
+    "endOffset": 41190,
+    "createdAt": "2026-09-20T14:55:22.599Z"
+  },
+  {
+    "id": "525fce68-9ad3-404c-9dca-816e93f7547e",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "被掳之前",
+    "startOffset": 41736,
+    "endOffset": 41740,
+    "createdAt": "2026-09-20T14:56:13.818Z"
+  },
+  {
+    "id": "4c0b3ec0-acfa-40f1-8f4a-699beb6aa379",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "虽然我们无意寻求精确的日期，但是一些研究结果仍有助于我们定出一个大概的日期。古代近东智慧作品，最早可溯自主前第二千年代。",
+    "startOffset": 41348,
+    "endOffset": 41408,
+    "createdAt": "2026-09-20T14:56:25.898Z"
+  },
+  {
+    "id": "04ac50ab-b08d-41b6-8946-09d86d031c10",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "thought",
+    "color": "#93c5fd",
+    "text": "日期",
+    "note": "论点：被掳之前",
+    "startOffset": 40204,
+    "endOffset": 40206,
+    "createdAt": "2026-09-20T14:56:44.173Z"
+  },
+  {
+    "id": "c06d4bf7-a474-422e-aee3-4a5e5f6d2983",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "本书的地理起源是以东，其精神与语言则是希伯来式的。",
+    "startOffset": 42204,
+    "endOffset": 42229,
+    "createdAt": "2026-09-20T14:57:59.020Z"
+  },
+  {
+    "id": "dd1fa76f-d23b-4bbc-bacd-b31829ae5791",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "作者必定是一个希伯来人或以色列人",
+    "startOffset": 42268,
+    "endOffset": 42284,
+    "createdAt": "2026-09-20T14:58:43.796Z"
+  },
+  {
+    "id": "957b0b09-7225-4020-b094-5a6cc3ced5b7",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "thought",
+    "color": "#93c5fd",
+    "text": "起源与作者",
+    "note": "起源：以东，作者：以色列人或希伯来人",
+    "startOffset": 41761,
+    "endOffset": 41766,
+    "createdAt": "2026-09-20T14:59:12.370Z"
+  },
+  {
+    "id": "5d3cd3c0-2a47-4793-94a1-7422f306df45",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "约伯记的作者创造了他自己的文学类型",
+    "startOffset": 42775,
+    "endOffset": 42792,
+    "createdAt": "2026-09-20T15:00:42.510Z"
+  },
+  {
+    "id": "aaec88e5-aebb-4747-b644-c18962d6c86b",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "thought",
+    "color": "#93c5fd",
+    "text": "文学结构",
+    "note": "待读",
+    "startOffset": 42503,
+    "endOffset": 42507,
+    "createdAt": "2026-09-20T15:07:38.189Z"
+  },
+  {
+    "id": "c85345e4-eb3f-42a6-af7f-2e169694744f",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "我们解释本书所要遵守的第一个解经原则，就是视其为一个整体。 $^{46}$ 若只专注于某一个层面的解释，则难免陷入见树不见林的困境。因此，我们先肯定约伯记的文学统一性，才能够领会书中完整的信息。",
+    "startOffset": 48960,
+    "endOffset": 49057,
+    "createdAt": "2026-09-20T15:09:28.731Z"
+  },
+  {
+    "id": "f5fe0d7d-8c04-4375-b00d-f9eaa668e0a6",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "thought",
+    "color": "#93c5fd",
+    "text": "约伯记的文学统一性",
+    "note": "约伯记的文学统一性",
+    "startOffset": 48950,
+    "endOffset": 48959,
+    "createdAt": "2026-09-20T15:09:36.991Z"
+  },
+  {
+    "id": "7b4cec54-75bf-41c9-a9a5-c14b3864277b",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "他经常引述希腊神话，然而他自己并不赞同神话世界",
+    "startOffset": 49453,
+    "endOffset": 49476,
+    "createdAt": "2026-09-20T15:10:33.356Z"
+  },
+  {
+    "id": "b4bd4620-2528-43b2-b73b-ed58603e0c5a",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "即使以利法及『诸圣者』（五1）也是在揶揄约伯。这里和诗篇八九5一样，都不是指神而言。",
+    "startOffset": 49725,
+    "endOffset": 49767,
+    "createdAt": "2026-09-20T15:11:37.434Z"
+  },
+  {
+    "id": "b563a4c6-a588-4882-afd6-9f5ccc6c7e25",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "以上经文均属诗歌体，且只能视作引述神话，而非相信世上真有此种生物存在。",
+    "startOffset": 50312,
+    "endOffset": 50347,
+    "createdAt": "2026-09-20T15:13:07.340Z"
+  },
+  {
+    "id": "a53375af-1352-4a8c-bed5-d50d785af6c0",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "约伯相信神是他的唯一源头。他从未暗示，若是神不给他答复，他能从其他神明那里获知答案。虽然他曾全心盼望他能（九33；十六21），但唯有神能解决公正与真理的问题，因此约伯单单向祂求诉。如果他信奉一个神话体系，那么他大可求告万神中的一位，作他的『仲裁者』，但是他没有。",
+    "startOffset": 50548,
+    "endOffset": 50679,
+    "createdAt": "2026-09-20T15:14:09.224Z"
+  },
+  {
+    "id": "8663d351-4c05-46f3-b912-83ec99e51cfd",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "此外，由于摩西律法禁止多神思想（出廿3～6），一卷显然是神话基础的著作，竟能通过先知时期（如果我们假定这是早期作品）以及除掉偶像崇拜之被掳时期，实与旧约神学不合。以西结记得约伯（还有挪亚与但以理）的义（结十四14，20）。我们晓得以西结反对异教崇拜与拜偶像（结八9～18；十四6～8等），若是他知道像约伯和但以理等人与拜偶像有牵连，他会把他们当作义的榜样才怪！",
+    "startOffset": 50789,
+    "endOffset": 50969,
+    "createdAt": "2026-09-20T15:14:51.242Z"
+  },
+  {
+    "id": "2760c792-6dd2-45c8-9823-cbd7c027748e",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "thought",
+    "color": "#93c5fd",
+    "text": "神话与约伯记",
+    "note": "约伯记没有赞同神话世界",
+    "startOffset": 49334,
+    "endOffset": 49340,
+    "createdAt": "2026-09-20T15:15:13.615Z"
+  },
+  {
+    "id": "493dd51e-8558-40b6-a39b-71313a8395c2",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "他的身分有别于『神的众子』。他不要读者们混淆，以为撒但——敌挡者——亦是合法的神的众子之一。",
+    "startOffset": 51450,
+    "endOffset": 51496,
+    "createdAt": "2026-09-20T15:17:37.906Z"
+  },
+  {
+    "id": "083dd8bc-9177-4ac2-ad12-29529e8badd5",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "撒但两次出现在神面前，作者都努力显示，若没有神的准许，他不能作甚么（一12；二6）。这种须经批准的记载，以及撒但控诉约伯会当面咒诅神的挑衅失败的事实，清楚避免了二元神学。",
+    "startOffset": 51534,
+    "endOffset": 51619,
+    "createdAt": "2026-09-20T15:18:18.733Z"
+  },
+  {
+    "id": "4dbb350b-c265-493a-aec0-4b38d0c1fa97",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "因此，我们看序幕中的撒但，有如旧约中弥赛亚的概念，在基督教以前的时期并未完全显明，直到第一世纪神借着基督道成肉身才完全显明。因此我们明白，这就是神的智慧。在祂还未借着圣灵在耶稣基督里将祂战胜罪和死亡，并且胜了撒但这个事实完全启示出来之前，祂不将撒但和鬼魔的世界完全展示出来。",
+    "startOffset": 52200,
+    "endOffset": 52337,
+    "createdAt": "2026-09-20T15:20:39.802Z"
+  },
+  {
+    "id": "bd4f9a5f-fbe7-4373-b8c5-8f1facdb7504",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "虽然在约伯记一至二章中，撒但并非神的首敌，但是他确是神的仇敌。即使他会虚张声势，亦无法与神同等——他必须在神所允准的范围内工作。",
+    "startOffset": 52550,
+    "endOffset": 52614,
+    "createdAt": "2026-09-20T15:21:34.425Z"
+  },
+  {
+    "id": "ee1eb1ee-8af0-49c4-baa0-d78995a46c5a",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "thought",
+    "color": "#93c5fd",
+    "text": "序幕中的撒但",
+    "note": "虽然在约伯记一至二章中，撒但并非神的首敌，但是他确是神的仇敌。即使他会虚张声势，亦无法与神同等——他必须在神所允准的范围内工作。",
+    "startOffset": 50970,
+    "endOffset": 50976,
+    "createdAt": "2026-09-20T15:21:44.446Z"
+  },
+  {
+    "id": "7a42b59f-4539-4bc8-97bf-fe1d3f5ccaa2",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "一个是热切的盼望，表达一个空虚心灵的需要；另一个则是应许，是将来应验之事的实底。后者不曾在约伯记中发现，前者则确实存在。",
+    "startOffset": 53204,
+    "endOffset": 53264,
+    "createdAt": "2026-09-20T15:23:49.505Z"
+  },
+  {
+    "id": "43522c18-7bad-484c-8361-ff5218fc4315",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "我们要避免的试探是用新约的概念把约伯记锤凿成新约的形式。",
+    "startOffset": 52717,
+    "endOffset": 52745,
+    "createdAt": "2026-09-20T15:24:32.500Z"
+  },
+  {
+    "id": "3e364d96-14e2-4afc-bbd3-5841ba94d36e",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "thought",
+    "color": "#93c5fd",
+    "text": "约伯记与新约",
+    "note": "我们要避免的试探是用新约的概念把约伯记锤凿成新约的形式。",
+    "startOffset": 52707,
+    "endOffset": 52713,
+    "createdAt": "2026-09-20T15:24:39.357Z"
+  },
+  {
+    "id": "67d353cc-d2d5-4968-837c-f96cdbe4e7b4",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#c4b5fd",
+    "text": "举例言之，我们千万不要将约伯记的『救赎主』（十九25）套入神在基督里道成肉身的教义，虽然可能有此引诱。",
+    "startOffset": 52777,
+    "endOffset": 52828,
+    "createdAt": "2026-09-20T15:24:46.179Z"
+  },
+  {
+    "id": "5314490a-7677-471f-81ac-2d2466877ddb",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#f8b4b4",
+    "text": "撒但认为约伯的信仰是建立在他的财富之上（一9～11；二5）。他认为信仰与财富是相关的，若是除去后者，前者随之崩溃。然而，神愿意用祂仆人的名誉去冒险，以证明撒但理论的误谬。最后，当祂证明了约伯的名誉，祂也维护了自己的名誉。因此本书不仅关切一个人信仰的纯正，亦关系到神的纯正。",
+    "startOffset": 53780,
+    "endOffset": 53916,
+    "createdAt": "2026-09-20T15:28:10.161Z"
+  },
+  {
+    "id": "151e92a9-a5af-44a8-b988-81831293aa29",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#f8b4b4",
+    "text": "这本书之所以伟大的原因之一，就是序幕之后直到结语之前，我们无从完全及固定的赞同约伯或诸友。有时对话是离心式的，有时则是向心式的。作者运用了熟练的写作技巧，迫使我们正视每一个人的言论。因此不论我们为约伯向神挑战而击掌称是，或是我们发现自己对诸友的言论点头赞许时，我们都不必觉得内咎。",
+    "startOffset": 54211,
+    "endOffset": 54351,
+    "createdAt": "2026-09-20T15:29:45.357Z"
+  },
+  {
+    "id": "c98cb429-3989-437b-9e89-21fabba01a58",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#86efac",
+    "text": "悲剧。",
+    "startOffset": 54352,
+    "endOffset": 54355,
+    "createdAt": "2026-09-20T15:30:04.794Z"
+  },
+  {
+    "id": "763bd29d-ed82-414f-b6e4-de7a6786a6e4",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "thought",
+    "color": "#f8b4b4",
+    "text": "约伯第一阶段悲剧的高峰是他儿女的死亡（一18～19），这使他坠入情感痛苦的深渊，于是他悲哀 $^{57}$ 降卑 $^{58}$ 俯伏在神面前（一20）",
+    "startOffset": 54486,
+    "endOffset": 54562,
+    "createdAt": "2026-09-20T15:30:44.318Z",
+    "note": "儿女的死亡"
+  },
+  {
+    "id": "6d8254a1-2cb1-4135-a368-6a74b7b7fdda",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "thought",
+    "color": "#f8b4b4",
+    "text": "第二阶段的悲剧临到约伯，撒但获准以脓疮攻击约伯全身（二1～8）。理由是因为撒但相信，若是一个人的价值不能用他的财富或儿女来计算，必能用他自己的性命来衡量，『人以皮代皮，情愿舍去一切所有的来保全性命。』",
+    "startOffset": 54566,
+    "endOffset": 54666,
+    "createdAt": "2026-09-20T15:30:53.839Z",
+    "note": "性命"
+  },
+  {
+    "id": "b9747e66-a24b-4f56-94ca-70e5ac606fce",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#86efac",
+    "text": "撒但打赌约伯会咒诅神（二5）",
+    "startOffset": 54776,
+    "endOffset": 54790,
+    "createdAt": "2026-09-20T15:31:52.353Z"
+  },
+  {
+    "id": "4550411f-aa3c-446f-9458-b5f468d1d6de",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#f8b4b4",
+    "text": "「此后约伯开口咒诅自己的生日」（三1）。这与撒但所预期的结果完全相反——他没有咒诅神，只咒诅自己的生日。",
+    "startOffset": 55283,
+    "endOffset": 55335,
+    "createdAt": "2026-09-20T15:33:47.682Z"
+  },
+  {
+    "id": "8bf889e8-b2fa-407e-bb59-fddf2d9d26b2",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#f8b4b4",
+    "text": "他因不可理解的苦难而咒诅他的整个生命，正如人常会以他们特殊片断的经历，来论及他们整个人生。约伯的一生当然尝过许多欢乐，但是当他像耶利米一样（耶廿14～18）咒诅自己的生日时，他认为生命全然苦涩。",
+    "startOffset": 55459,
+    "endOffset": 55556,
+    "createdAt": "2026-09-20T15:34:40.707Z"
+  },
+  {
+    "id": "4dffb5cc-722f-4c1c-b335-ccbc1de42336",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "thought",
+    "color": "#f8b4b4",
+    "text": "咒诅他的生日（3a，4，5，11～19节）、他成孕的夜晚（3b，6～10节），以及哀叹生命（20～26节）。",
+    "note": "三部分",
+    "startOffset": 55345,
+    "endOffset": 55399,
+    "createdAt": "2026-09-20T15:34:55.164Z"
+  },
+  {
+    "id": "77d91775-539e-40d9-b011-bb391a7a9ff9",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#86efac",
+    "text": "约伯对生命完全迷惘了",
+    "startOffset": 55557,
+    "endOffset": 55567,
+    "createdAt": "2026-09-20T15:35:03.316Z"
+  },
+  {
+    "id": "44a654d3-5703-46bd-92ac-a9ce7731ccf3",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#f8b4b4",
+    "text": "虽然他整篇言论都是情绪化的。但是以后就未再像此次这样全然失去理性。但是对那些忍受身心苦楚的人来说，身心受创之后，未必立刻产生失去理智的反应。约伯先重新肯定他的信仰，然后才述说他苦涩的生命。跌入失望的深渊之后，只能缓慢艰难地回复。",
+    "startOffset": 55671,
+    "endOffset": 55785,
+    "createdAt": "2026-09-20T15:36:16.526Z"
+  },
+  {
+    "id": "67939160-d5d4-4e16-b017-bef34de6edc9",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#86efac",
+    "text": "辩论方法",
+    "startOffset": 56499,
+    "endOffset": 56503,
+    "createdAt": "2026-09-20T15:37:26.306Z"
+  },
+  {
+    "id": "fb576cb7-85d8-4af8-90c8-2c922b9e950a",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#f8b4b4",
+    "text": "虽然一方会对另一方的言论秉持强烈的异议，但是他们往往是根据他们自以为所听到的，而非对方真正所说的来反应",
+    "startOffset": 56528,
+    "endOffset": 56579,
+    "createdAt": "2026-09-20T15:38:50.383Z"
+  },
+  {
+    "id": "38e07304-51ae-4b19-86c5-fb5e4e07168b",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#f8b4b4",
+    "text": "约伯的回答也不全是直接根据前一位的言论而发。按照此种延迟反应原则，当他针对前一位朋友的谈话而发言时，就像化学反应，有些话要过一阵子才发生作用。",
+    "startOffset": 56627,
+    "endOffset": 56698,
+    "createdAt": "2026-09-20T15:39:00.385Z"
+  },
+  {
+    "id": "3b8ffbed-80ed-4c5f-a7cc-557a8a575ae5",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#86efac",
+    "text": "以利法与约伯——第一循环：第一回合（四～五章／六～七章）",
+    "startOffset": 56961,
+    "endOffset": 56989,
+    "createdAt": "2026-09-20T15:39:50.253Z"
+  },
+  {
+    "id": "4eec9378-0172-44b3-ac19-d9ec67ef437d",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#86efac",
+    "text": "他把约伯的生活态度（四3～6）与悲剧（四7～11）连在一起",
+    "startOffset": 57071,
+    "endOffset": 57100,
+    "createdAt": "2026-09-20T15:40:33.792Z"
+  },
+  {
+    "id": "76a12e39-9e04-4237-b868-e77530bceaec",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#86efac",
+    "text": "他所提出的宇宙原则：宇宙乃是按因果律而运行（四7～11）。凡事有果必定有因。",
+    "startOffset": 57131,
+    "endOffset": 57169,
+    "createdAt": "2026-09-20T15:40:46.798Z"
+  },
+  {
+    "id": "0435913b-26bb-4356-95c7-90fd9ef1be1f",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#f8b4b4",
+    "text": "以利法提到一个梦境（四12～21），他由其中获知人不能在神面前自称为义，并且暗示约伯亦不例外。接下来的经文（18～21节）可说是以利法对于梦的解析，或是他对梦境的默想。",
+    "startOffset": 57246,
+    "endOffset": 57330,
+    "createdAt": "2026-09-20T15:41:06.512Z"
+  },
+  {
+    "id": "61b2b09a-dc36-4097-ada7-dfe3781df549",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#f8b4b4",
+    "text": "五6～7出现了一个解经上的问题。如果他的主题是人类遭遇祸患乃是自作孽的结果（四7～8），那么『人生在世必遇患难，如同火星飞腾』的说法就不正确了",
+    "startOffset": 57354,
+    "endOffset": 57425,
+    "createdAt": "2026-09-20T15:43:44.732Z"
+  },
+  {
+    "id": "558b3a7c-3feb-45fc-a1e6-383d93f6c16c",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#f8b4b4",
+    "text": "我们可以视五7为以利法引述别人的话，但他自己并不相信 $^{64}$ （『有人说：「人生在世……」』）",
+    "startOffset": 57472,
+    "endOffset": 57523,
+    "createdAt": "2026-09-20T15:44:14.050Z"
+  },
+  {
+    "id": "c7641ac8-21b9-42b0-be69-cb9d8c55fc33",
+    "bookId": "e5c7ba94-9e73-4f82-8c33-33a51dacf5d9",
+    "type": "highlight",
+    "color": "#86efac",
+    "text": "以利法又提出了第二个原则，认为受苦可能是神的责罚，为要纠正和医治（五17～18）",
+    "startOffset": 57653,
+    "endOffset": 57693,
+    "createdAt": "2026-09-20T15:44:54.783Z"
   }
 ]
