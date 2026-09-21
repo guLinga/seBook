@@ -176,45 +176,37 @@
   }
 
   mark.mark-layer {
-    position: relative;
     border-radius: 2px;
-    padding: 0 2px;
+    padding: 0 1px;
     cursor: pointer;
 
-    // 固定高对比起止边，与粉色/蓝绿等高亮底色区分
+    // 行内括号，贴在这段文字的第一个字前和最后一个字后（跨行也不会跑到行框两侧）
     &.is-mark-start::before,
     &.is-mark-end::after {
       content: '';
-      position: absolute;
-      top: -2px;
-      bottom: -2px;
-      width: 9px;
-      pointer-events: none;
+      display: inline-block;
+      width: 0.42em;
+      height: 0.9em;
+      vertical-align: -0.08em;
       box-sizing: border-box;
+      pointer-events: none;
       border-color: var(--mark-bound);
-      background: color-mix(in srgb, var(--mark-bound) 22%, transparent);
-      opacity: 1;
-      z-index: 1;
     }
 
     &.is-mark-start::before {
-      left: -2px;
-      border-left: 3px solid;
-      border-top: 3px solid;
-      border-bottom: 3px solid;
-      border-radius: 4px 0 0 4px;
+      margin-right: 0.12em;
+      border-left: 3px solid var(--mark-bound);
+      border-top: 3px solid var(--mark-bound);
+      border-bottom: 3px solid var(--mark-bound);
+      border-radius: 3px 0 0 3px;
     }
 
     &.is-mark-end::after {
-      right: -2px;
-      border-right: 3px solid;
-      border-top: 3px solid;
-      border-bottom: 3px solid;
-      border-radius: 0 4px 4px 0;
-    }
-
-    &.is-mark-start.is-mark-end {
-      border-radius: 3px;
+      margin-left: 0.12em;
+      border-right: 3px solid var(--mark-bound);
+      border-top: 3px solid var(--mark-bound);
+      border-bottom: 3px solid var(--mark-bound);
+      border-radius: 0 3px 3px 0;
     }
   }
 

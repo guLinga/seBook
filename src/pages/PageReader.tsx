@@ -52,6 +52,47 @@ type SelectionState = {
   rect: DOMRect
 }
 
+function applyMarkAppearance(mark: HTMLElement, item: Annotation, editingId: string | null) {
+  mark.className = `mark-layer mark-${item.type}`
+  mark.style.backgroundColor = `${item.color}88`
+  mark.style.setProperty('--mark-accent', item.color)
+  mark.dataset.annotationId = item.id
+  mark.dataset.color = item.color
+  mark.contentEditable = 'false'
+  mark.classList.toggle('is-doubt', item.type === 'doubt')
+  mark.classList.toggle('is-thought', item.type === 'thought')
+  mark.classList.toggle('is-editing', editingId === item.id)
+}
+
+function styleAnnotationMarks(marks: HTMLElement[], item: Annotation, editingId: string | null) {
+  for (const mark of marks) applyMarkAppearance(mark, item, editingId)
+  decorateAnnotationMarkBounds(marks)
+}
+
+function unwrapMarks(nodes: Element[]) {
+  for (const node of nodes) {
+    const parent = node.parentNode
+    if (!parent) continue
+    while (node.firstChild) parent.insertBefore(node.firstChild, node)
+    parent.removeChild(node)
+    parent.normalize()
+  }
+}
+
+function paintAnnotationMark(root: HTMLElement, item: Annotation, editingId: string | null) {
+  if (item.endOffset <= item.startOffset) return
+  const range = getRangeFromOffsets(root, item.startOffset, item.endOffset)
+  if (!range || range.collapsed) return
+  wrapRangeWithMark(range, () => {
+    const mark = document.createElement('mark')
+    applyMarkAppearance(mark, item, editingId)
+    return mark
+  })
+  decorateAnnotationMarkBounds([
+    ...root.querySelectorAll<HTMLElement>(`.mark-layer[data-annotation-id="${CSS.escape(item.id)}"]`),
+  ])
+}
+
 function buildTocFromHeadings(headings: HTMLElement[]) {
   const used = new Map<string, number>()
   return headings.map((heading, index) => {
@@ -344,89 +385,22 @@ function PageReader() {
 
     const visible = annotations.filter((item) => item.endOffset > item.startOffset)
     const byId = groupAnnotationMarks(root)
-    const sameIds =
-      byId.size === visible.length && visible.every((item) => byId.has(item.id))
+    const wanted = new Set(visible.map((item) => item.id))
 
-    // DOM 已有完整划线：原地改样式并校准偏移，避免 unwrap 后用旧偏移重绘错位
-    if (sameIds) {
-      let offsetsChanged = false
-      const next = annotations.map((item) => {
-        const marks = byId.get(item.id)
-        if (!marks?.length) return item
-
-        for (const mark of marks) {
-          mark.className = `mark-layer mark-${item.type}`
-          mark.style.backgroundColor = `${item.color}88`
-          mark.style.setProperty('--mark-accent', item.color)
-          mark.dataset.annotationId = item.id
-          mark.dataset.color = item.color
-          mark.contentEditable = 'false'
-          mark.classList.toggle('is-doubt', item.type === 'doubt')
-          mark.classList.toggle('is-thought', item.type === 'thought')
-          mark.classList.toggle('is-editing', editingId === item.id)
-        }
-        decorateAnnotationMarkBounds(marks)
-
-        const offsets = getOffsetsFromAnnotationMarks(root, marks)
-        if (
-          !offsets ||
-          (offsets.startOffset === item.startOffset &&
-            offsets.endOffset === item.endOffset &&
-            (!offsets.text || offsets.text === item.text))
-        ) {
-          return item
-        }
-
-        offsetsChanged = true
-        return {
-          ...item,
-          startOffset: offsets.startOffset,
-          endOffset: offsets.endOffset,
-          text: offsets.text || item.text,
-        }
-      })
-
-      if (offsetsChanged) {
-        annotationsRef.current = next
-        setAnnotations(next)
-        persistAnnotationOffsets(next)
-      }
-      return
+    for (const [id, marks] of byId) {
+      if (!wanted.has(id)) unwrapMarks(marks)
     }
 
-    root.querySelectorAll('.mark-layer').forEach((node) => {
-      const parent = node.parentNode
-      if (!parent) return
-      while (node.firstChild) parent.insertBefore(node.firstChild, node)
-      parent.removeChild(node)
-      parent.normalize()
-    })
-
-    if (!annotations.length) return
-
-    const sorted = [...annotations].sort((a, b) => b.startOffset - a.startOffset)
-    for (const item of sorted) {
-      if (item.endOffset <= item.startOffset) continue
-      const range = getRangeFromOffsets(root, item.startOffset, item.endOffset)
-      if (!range || range.collapsed) continue
-      wrapRangeWithMark(range, () => {
-        const mark = document.createElement('mark')
-        mark.className = `mark-layer mark-${item.type}`
-        mark.style.backgroundColor = `${item.color}88`
-        mark.style.setProperty('--mark-accent', item.color)
-        mark.dataset.annotationId = item.id
-        mark.dataset.color = item.color
-        mark.contentEditable = 'false'
-        if (item.type === 'doubt') mark.classList.add('is-doubt')
-        if (item.type === 'thought') mark.classList.add('is-thought')
-        if (editingId === item.id) mark.classList.add('is-editing')
-        return mark
-      })
-      const created = root.querySelectorAll<HTMLElement>(
-        `.mark-layer[data-annotation-id="${item.id}"]`,
-      )
-      decorateAnnotationMarkBounds([...created])
+    const missing: Annotation[] = []
+    for (const item of visible) {
+      const marks = byId.get(item.id)
+      if (marks?.length) styleAnnotationMarks(marks, item, editingId)
+      else missing.push(item)
     }
+
+    // 只包新划线。从后往前包，避免改动前面的文本节点
+    missing.sort((a, b) => b.startOffset - a.startOffset)
+    for (const item of missing) paintAnnotationMark(root, item, editingId)
   }, [annotations, editingId, toc, contentRevision])
 
   useLayoutEffect(() => {
@@ -672,41 +646,80 @@ function PageReader() {
     setNoteDraft('')
   }
 
+  function commitAnnotations(next: Annotation[]) {
+    annotationsRef.current = next
+    setAnnotations(next)
+  }
+
   async function submitAnnotation(type: AnnotationType, note?: string) {
     if (!selection) return
     const root = contentRef.current
     if (root) syncAnnotationOffsetsFromDom(root)
 
-    const item = await createAnnotation(id, {
+    const draft = {
       type,
       color,
       text: selection.text,
       note: note?.trim() || undefined,
       startOffset: selection.startOffset,
       endOffset: selection.endOffset,
-    })
-    setAnnotations((prev) => [...prev, item])
+    }
+    const tempId = `local-${crypto.randomUUID()}`
+    const optimistic: Annotation = {
+      id: tempId,
+      bookId: id,
+      ...draft,
+      createdAt: new Date().toISOString(),
+    }
+    commitAnnotations([...annotationsRef.current, optimistic])
     clearToolbar()
     window.getSelection()?.removeAllRanges()
+
+    try {
+      const item = await createAnnotation(id, draft)
+      root?.querySelectorAll<HTMLElement>(`[data-annotation-id="${CSS.escape(tempId)}"]`).forEach((mark) => {
+        mark.dataset.annotationId = item.id
+      })
+      commitAnnotations(annotationsRef.current.map((annotation) => (annotation.id === tempId ? item : annotation)))
+    } catch {
+      commitAnnotations(annotationsRef.current.filter((annotation) => annotation.id !== tempId))
+    }
   }
 
   async function handleSaveEdit() {
     if (!editingId || !activeType) return
-    const note =
-      activeType === 'highlight' ? undefined : noteDraft.trim() || undefined
-    const item = await updateAnnotation(id, editingId, {
+    const note = activeType === 'highlight' ? undefined : noteDraft.trim() || undefined
+    const payload = {
       type: activeType,
       color,
       note: activeType === 'highlight' ? '' : note || '',
-    })
-    setAnnotations((prev) => prev.map((annotation) => (annotation.id === item.id ? item : annotation)))
+    }
+    const previous = annotationsRef.current
+    commitAnnotations(
+      previous.map((annotation) => (annotation.id === editingId ? { ...annotation, ...payload } : annotation)),
+    )
     clearToolbar()
+
+    try {
+      const item = await updateAnnotation(id, editingId, payload)
+      commitAnnotations(
+        annotationsRef.current.map((annotation) => (annotation.id === item.id ? item : annotation)),
+      )
+    } catch {
+      commitAnnotations(previous)
+    }
   }
 
   async function handleDeleteAnnotation(annotationId: string) {
-    await deleteAnnotation(id, annotationId)
-    setAnnotations((prev) => prev.filter((item) => item.id !== annotationId))
+    const previous = annotationsRef.current
+    commitAnnotations(previous.filter((item) => item.id !== annotationId))
     if (editingId === annotationId) clearToolbar()
+
+    try {
+      await deleteAnnotation(id, annotationId)
+    } catch {
+      commitAnnotations(previous)
+    }
   }
 
   async function handleDeleteBook() {
